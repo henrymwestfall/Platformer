@@ -43,7 +43,7 @@ class Game:
                 done = True
 
             self.current_scene.update(dt, self.time)
-            self.current_scene.draw(self.screen)
+            self.current_scene.draw()
 
             pg.display.flip()
         self.quit()

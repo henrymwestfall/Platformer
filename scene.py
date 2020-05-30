@@ -8,6 +8,9 @@ class Scene:
         self.game = game
         self.game.scenes_by_name[self.name] = self
 
+        self.screen = self.game.screen
+        self.screen_rect = self.screen.get_rect()
+
         # groups / collision layers
         self.children = pg.sprite.Group() # all child sprites
 
@@ -19,7 +22,7 @@ class Scene:
         # environment
         self.background = SKY_BLUE
         self.gravity = 0.05
-        self.terminal_velocity = pg.math.Vector2(0, 800)
+        self.terminal_velocity = pg.math.Vector2(0, 1000)
 
         # input
         self.events = []
@@ -38,22 +41,22 @@ class Scene:
         self.keys_pressed = pg.key.get_pressed()
 
     
-    def draw(self, screen):
-        screen.fill(self.background)
+    def draw(self):
+        self.screen.fill(self.background)
         
         # order matters
-        self.draw_group(self.static_bodies, screen)
-        self.draw_group(self.projectiles, screen)
-        self.draw_group(self.rigid_bodies, screen)
-        self.draw_group(self.particles, screen)
+        self.draw_group(self.static_bodies)
+        self.draw_group(self.projectiles)
+        self.draw_group(self.rigid_bodies)
+        self.draw_group(self.particles)
 
-    def draw_group(self, group, screen):
+    def draw_group(self, group):
         for e in group:
             rect = pg.Rect(e.rect)
             rect.x -= self.camera_shift.x
             rect.y -= self.camera_shift.y
-            screen.blit(e.image, rect)
-
+            if rect.colliderect(self.screen_rect):
+                self.screen.blit(e.image, rect)
     def start(self):
         pass
 

@@ -40,17 +40,30 @@ class TestRigidBody(RigidBody):
         self.acc = 0.1
 
         self.long_jump_timer_started = False
+        self.jumping = False
+        self.jump_start = 0
+        self.jump_time = 0.15
+        self.jump_decay = 0.9
+        self.jump_strength = 200
 
     def update(self, dt, t):
         super().update(dt, t)
         self.pos = pg.math.Vector2(self.rect.topleft)
 
-        if self.landed and self.scene.keys_pressed[pg.K_UP]:
-            self.vel += pg.math.Vector2(0, -1000)
-
+        was_jumping = self.jumping
+        if (self.landed or self.jumping) and self.scene.keys_pressed[pg.K_UP]:
+            self.jumping = True
+            if not was_jumping:
+                self.jump_start = t
+            if (t - self.jump_start) <= self.jump_time:
+                self.vel += pg.math.Vector2(0, -self.jump_strength * self.jump_decay ** (t - self.jump_start))
+            """
             if not self.long_jump_timer_started:
                 pg.time.set_timer(pg.USEREVENT, 100)
                 self.long_jump_timer_started = True
+            """
+        else:
+            self.jumping = False
 
         if self.scene.keys_pressed[pg.K_RIGHT]:
             self.vel.x = self.vel.lerp(pg.math.Vector2(self.speed, 0), self.acc).x
