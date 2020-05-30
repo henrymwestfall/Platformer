@@ -25,6 +25,7 @@ class Game:
         self.time = 0
 
         self.current_scene = TestScene(self)
+        self.current_scene.start()
 
         self.main_loop()
 

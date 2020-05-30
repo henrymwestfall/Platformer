@@ -1,6 +1,6 @@
 import pygame as pg
 
-from colors import SKY_BLUE
+from colors import SKY_BLUE, BLACK
 
 class Scene:
     def __init__(self, name, game):
@@ -54,6 +54,9 @@ class Scene:
             rect.y -= self.camera_shift.y
             screen.blit(e.image, rect)
 
+    def start(self):
+        pass
+
     def update(self, dt, t):
         # update camera
         if self.camera_focus != None:
@@ -77,3 +80,8 @@ class Scene:
 
         for sprite in self.rigid_bodies:
             sprite.update(dt, t)
+        for particle in self.particles:
+            particle.update(dt, t)
+
+    def close(self):
+        pass

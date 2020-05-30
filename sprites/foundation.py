@@ -16,6 +16,7 @@ class RigidBody(pg.sprite.DirtySprite):
         # movement attributes
         self.vel = pg.math.Vector2(0, 0)
         self.landed = False
+        self.was_landed_last_frame = False
         self.underneath = None
 
     def update(self, dt, t):
@@ -26,14 +27,14 @@ class RigidBody(pg.sprite.DirtySprite):
         for sprite in self.scene.static_bodies:
             if pg.sprite.collide_rect(self, sprite):
                 # if we landed on it
-                if (self.rect.y <= sprite.rect.y) and (self.rect.centerx in range(sprite.rect.left, sprite.rect.right)):
+                if (self.vel.y >= 0) and (self.rect.centerx in range(sprite.rect.left, sprite.rect.right)):
                     self.rect.bottom = sprite.rect.top
                     self.vel.y = 0
                     self.landed = True
                     self.underneath = sprite
                 
                 # head butted it
-                elif (self.rect.top > sprite.rect.bottom) and (self.rect.centerx in range(sprite.rect.left, sprite.rect.right)):
+                elif (self.vel.y < 0) and (self.rect.centerx in range(sprite.rect.left, sprite.rect.right)):
                     self.rect.top = sprite.rect.bottom
                     self.vel.y = 0
                 
@@ -55,3 +56,14 @@ class StaticBody(pg.sprite.DirtySprite):
         pass
 
 # TODO: particle and projectile class
+class Particle(pg.sprite.DirtySprite):
+    def __init__(self, scene):
+        pg.sprite.DirtySprite.__init__(self, scene.children, scene.particles)
+
+        self.scene = scene
+        self.collision_groups = []
+
+        self.life_time = 0
+
+    def update(self, dt, t):
+        pass
