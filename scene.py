@@ -30,8 +30,8 @@ class Scene:
 
         # camera
         self.camera_focus = None
-        self.camera_speed = 300
-        self.camera_acc = 0.025
+        self.camera_speed = 500
+        self.camera_acc = 0.05
         self.camera_drag = 100
         self.camera_shift = pg.math.Vector2(0, 0)
 
@@ -65,8 +65,6 @@ class Scene:
         # update camera
         if self.camera_focus != None:
             middle = pg.math.Vector2(self.game.screen.get_width() / 2, self.game.screen.get_height() / 2)
-            if self.camera_focus.rect.centerx not in range(int(self.game.screen.get_width() / 2) - self.camera_drag, int(self.game.screen.get_width() / 2) + self.camera_drag):
-                self.camera_shift.x = self.camera_shift.lerp(pg.math.Vector2(self.camera_focus.rect.centerx), self.camera_acc).x
 
             needs_update = False
             if self.camera_focus.rect.centerx < middle.x - self.camera_drag: # move camera left

@@ -46,12 +46,13 @@ class TestRigidBody(RigidBody):
         super().update(dt, t)
         self.pos = pg.math.Vector2(self.rect.topleft)
 
+        # jump
         if self.landed and self.scene.keys_pressed[pg.K_UP]:
             self.vel.y = -self.jump_strength
         elif self.vel.y < 0 and not self.scene.keys_pressed[pg.K_UP]:
             self.vel.y *= self.jump_cut
 
-        self.was_landed_last_frame = False
+        # move left/right
         self.moving = False
         if self.scene.keys_pressed[pg.K_RIGHT]:
             self.vel.x = self.vel.lerp(pg.math.Vector2(self.speed, 0), self.acc).x
@@ -66,15 +67,14 @@ class TestRigidBody(RigidBody):
                 self.vel = new_vel
             else:
                 self.vel.x = 0
-
+        
+        # update position
         self.pos += self.vel * dt
-
         rect_pos = pg.math.Vector2(self.pos)
         if rect_pos.x < 0:
             rect_pos.x = math.ceil(rect_pos.x)
         elif rect_pos.x > 0:
             rect_pos.x = math.floor(rect_pos.x)
-
         self.rect.topleft = rect_pos
 
 
