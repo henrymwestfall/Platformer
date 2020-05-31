@@ -39,7 +39,7 @@ class RigidBody(pg.sprite.DirtySprite):
                     self.vel.y = 0
                 
         if not self.landed:
-             self.vel = self.vel.lerp(self.scene.terminal_velocity, self.scene.gravity)
+             self.vel += pg.math.Vector2(0, self.scene.gravity)#self.vel.lerp(self.scene.terminal_velocity, self.scene.gravity)
 
         
 

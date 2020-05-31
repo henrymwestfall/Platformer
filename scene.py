@@ -21,8 +21,8 @@ class Scene:
 
         # environment
         self.background = SKY_BLUE
-        self.gravity = 0.05
-        self.terminal_velocity = pg.math.Vector2(0, 1000)
+        self.gravity = 50
+        self.terminal_velocity = pg.math.Vector2(0, 1250)
 
         # input
         self.events = []
@@ -57,6 +57,7 @@ class Scene:
             rect.y -= self.camera_shift.y
             if rect.colliderect(self.screen_rect):
                 self.screen.blit(e.image, rect)
+                
     def start(self):
         pass
 
