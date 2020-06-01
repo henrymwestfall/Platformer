@@ -1,3 +1,5 @@
+import random
+
 import pygame as pg
 
 from colors import SKY_BLUE, BLACK
@@ -32,8 +34,12 @@ class Scene:
         self.camera_focus = None
         self.camera_speed = 500
         self.camera_acc = 0.05
-        self.camera_drag = 100
+        self.camera_drag = 25
         self.camera_shift = pg.math.Vector2(0, 0)
+
+        self.screen_shake_start = 0
+        self.screen_shake_duration = 0
+        self.screen_shake_magnitude = 0
 
     
     def handle_events(self):
@@ -80,10 +86,28 @@ class Scene:
             if needs_update:
                 self.camera_shift = self.camera_shift.lerp(pg.math.Vector2(self.camera_focus.rect.center) - middle, self.camera_acc)
 
+        # screenshake
+        if t - self.screen_shake_start >= self.screen_shake_duration:
+                self.screen_shake_duration = 0
+        if self.screen_shake_duration > 0:
+            choices = [self.screen_shake_magnitude, 0]
+            random.shuffle(choices)
+            shift = pg.math.Vector2(choices) * random.choice([-1, 1])
+            progress = (t - self.screen_shake_start) / self.screen_shake_duration
+            shift = shift.lerp(pg.math.Vector2(0, 0), progress)
+
+            self.camera_shift += shift
+            
+
         for sprite in self.rigid_bodies:
             sprite.update(dt, t)
         for particle in self.particles:
             particle.update(dt, t)
+
+    def shake_screen(self, t, magnitude, duration):
+        self.screen_shake_start = t
+        self.screen_shake_magnitude = magnitude
+        self.screen_shake_duration = duration
 
     def close(self):
         pass

@@ -67,6 +67,9 @@ class TestRigidBody(RigidBody):
                 self.vel = new_vel
             else:
                 self.vel.x = 0
+
+        if self.scene.keys_pressed[pg.K_SPACE]:
+            self.scene.shake_screen(t, 50, 2)
         
         # update position
         self.pos += self.vel * dt
