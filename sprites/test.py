@@ -68,6 +68,16 @@ class TestRigidBody(RigidBody):
             else:
                 self.vel.x = 0
 
+        self.image = pg.Surface([32, 32])
+        self.image.fill(BLACK)
+        internal_image = pg.Surface([24, 24])
+        if self.moving:
+            internal_image.fill(RED)
+        else:
+            internal_image.fill(BLUE)
+        rect = pg.Rect(4, 4, 28, 28)
+        self.image.blit(internal_image, rect)
+
         if self.scene.keys_pressed[pg.K_SPACE]:
             self.scene.shake_screen(t, 50, 2)
         
