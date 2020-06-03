@@ -25,12 +25,12 @@ class RigidBody(pg.sprite.DirtySprite):
         
         hit_list = pg.sprite.spritecollide(self, self.scene.static_bodies, False)
         for static_body in hit_list:
-            if self.vel.x < 0: # moving left
+            if (self.vel.x < 0) and (self.rect.right > static_body.rect.right): # moving left
                 self.rect.left = static_body.rect.right
                 self.pos.x = self.rect.left
                 self.collisions["left"].append(static_body)
                 self.vel.x = 0
-            elif self.vel.x > 0: # moving right
+            elif (self.vel.x > 0) and (self.rect.left < static_body.rect.left): # moving right
                 self.rect.right = static_body.rect.left
                 self.pos.x = self.rect.left
                 self.collisions["right"].append(static_body)
