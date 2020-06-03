@@ -20,6 +20,41 @@ class Platform(StaticBody):
 
         self.friction = 100
 
+    def compress_with(self, other, kill=False, delete=False):
+        # make sure they align to form a valid rectangle
+
+        if not pg.sprite.collide_rect(self, other):
+            return [self, other]
+
+        if (self.rect.left == other.rect.left) and (self.rect.width == other.rect.width):
+            height = max([self.rect.bottom, other.rect.bottom]) - min([self.rect.top, other.rect.top])
+            y = min([self.rect.top, other.rect.top])
+            x = self.rect.x
+            width = self.rect.width
+        elif (self.rect.top == other.rect.top) and (self.rect.height == other.rect.height):
+            width = max([self.rect.right, other.rect.right]) - min([self.rect.left, other.rect.left])
+            x = min([self.rect.left, other.rect.left])
+            y = self.rect.y
+            height = self.rect.height
+        else:
+            return [self, other]
+        
+        new_platform = Platform(self.scene, x, y, width, height)
+        
+        if (kill == delete):
+            if kill:
+                self.kill()
+                other.kill()
+            if delete:
+                del other
+                del self
+        else:
+            print("Warning: Platform.compress_with arguments kill and delete must have same value")
+        
+        return [new_platform]
+
+        
+
 
 class Player(RigidBody):
     def __init__(self, scene, x, y):

@@ -23,23 +23,19 @@ class Demo(Scene):
             Platform(self, i * 2000 + 550, 350, 2000, 32)
         Platform(self, 400, 200, 32, 100)
         Platform(self, 500, 200, 32, 100)
+        
+        a = Platform(self, 400, 100, 32, 32)
+        b = Platform(self, 400, 132, 32, 32)
+        print(a.compress_with(b, True, True))
+
         self.player = Player(self, 450, 100)
         self.camera_focus = self.player
 
     def handle_events(self):
         super().handle_events()
-
-        # TODO: define in player class
-        for e in self.events:
-            if e.type == pg.USEREVENT:
-                pg.time.set_timer(pg.USEREVENT, 0)
-                if self.keys_pressed[pg.K_UP]:
-                    self.player.vel += pg.math.Vector2(0, -600)
-                self.player.long_jump_timer_started = False
-                break
+        
 
     def update(self, dt, t):
-
         super().update(dt, t)
 
         to_the_right = 0
