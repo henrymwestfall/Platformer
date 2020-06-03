@@ -5,23 +5,23 @@ import pygame as pg
 from .foundation import RigidBody, StaticBody, Particle
 from colors import *
 
-class TestStaticBody(StaticBody):
-    def __init__(self, scene, x, y, width):
+class Platform(StaticBody):
+    def __init__(self, scene, x, y, width, height):
         StaticBody.__init__(self, scene)
 
-        self.image = pg.Surface([width, 32])
+        self.image = pg.Surface([width, height])
         self.image.fill(BLACK)
-        internal_image = pg.Surface([width - 8, 24])
+        internal_image = pg.Surface([width - 8, height - 8])
         internal_image.fill(GREEN)
         rect = pg.Rect(4, 4, width - 4, 28)
         self.image.blit(internal_image, rect)
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
 
-        self.friction = pg.math.Vector2(100, 0)
+        self.friction = 100
 
 
-class TestRigidBody(RigidBody):
+class Player(RigidBody):
     def __init__(self, scene, x, y):
         RigidBody.__init__(self, scene)
 
@@ -42,12 +42,18 @@ class TestRigidBody(RigidBody):
         self.jump_strength = 1000
         self.jump_cut = 0.5
 
+        self.grip = 100
+
     def update(self, dt, t):
-        super().update(dt, t)
-        self.pos = pg.math.Vector2(self.rect.topleft)
+        landed = len(self.collisions["down"]) > 0
+        touching_left = len(self.collisions["left"]) > 0
+        touching_right = len(self.collisions["right"]) > 0
+
+        if not landed:
+             self.vel += pg.math.Vector2(0, self.scene.gravity) * dt
 
         # jump
-        if self.landed and self.scene.keys_pressed[pg.K_UP]:
+        if landed and self.scene.keys_pressed[pg.K_UP]:
             self.vel.y = -self.jump_strength
         elif self.vel.y < 0 and not self.scene.keys_pressed[pg.K_UP]:
             self.vel.y *= self.jump_cut
@@ -60,11 +66,12 @@ class TestRigidBody(RigidBody):
         if self.scene.keys_pressed[pg.K_LEFT]:
             self.vel.x = self.vel.lerp(pg.math.Vector2(-self.speed, 0), self.acc).x
             self.moving = True
-        if self.landed and not self.moving:
-            friction = self.underneath.friction * math.copysign(1, -self.vel.x)
-            new_vel = self.vel + friction
-            if math.copysign(1, self.vel.x) == math.copysign(1, new_vel.x):
-                self.vel = new_vel
+
+        if landed and not self.moving:
+            friction = self.collisions["down"][0].friction * math.copysign(1, -self.vel.x)
+            new_vel_x = self.vel.x + friction
+            if math.copysign(1, self.vel.x) == math.copysign(1, new_vel_x):
+                self.vel.x = new_vel_x
             else:
                 self.vel.x = 0
 
@@ -82,7 +89,7 @@ class TestRigidBody(RigidBody):
             self.scene.shake_screen(t, 50, 2)
         
         # update position
-        self.pos += self.vel * dt
+        self.move(dt)
         rect_pos = pg.math.Vector2(self.pos)
         if rect_pos.x < 0:
             rect_pos.x = math.ceil(rect_pos.x)

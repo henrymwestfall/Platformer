@@ -1,15 +1,16 @@
 import pygame as pg
 
 from scene import Scene
-from sprites.test import TestStaticBody, TestRigidBody
+from sprites.test import Platform, Player
 
 import random
+import time
 
-class TestScene(Scene):
+class Demo(Scene):
     def __init__(self, game):
         Scene.__init__(self, "Test", game)
 
-        self.widths = range(100, 300)
+        self.widths = range(30, 150)
         self.y_range = range(30, 570)
         self.gaps = range(50, 150)
 
@@ -17,8 +18,12 @@ class TestScene(Scene):
         self.camera_focus = self.player
 
     def start(self):
-        TestStaticBody(self, 450, 300, 900)
-        self.player = TestRigidBody(self, 450, 100)
+        pg.display.set_caption("Demo")
+        for i in range(10):
+            Platform(self, i * 2000 + 550, 350, 2000, 32)
+        Platform(self, 400, 200, 32, 100)
+        Platform(self, 500, 200, 32, 100)
+        self.player = Player(self, 450, 100)
         self.camera_focus = self.player
 
     def handle_events(self):
@@ -34,17 +39,18 @@ class TestScene(Scene):
                 break
 
     def update(self, dt, t):
+
         super().update(dt, t)
 
         to_the_right = 0
         for platform in self.static_bodies:
-            if self.player.underneath == platform or platform.rect.x > self.player.rect.x:
+            if platform.rect.x >= self.player.rect.x:
                 to_the_right += 1
-            if self.player.rect.x - platform.rect.x >= 2000:
+            if self.player.rect.x - platform.rect.x >= 10000:
                 platform.kill()
                 del platform
 
-        if to_the_right < 4:
+        if to_the_right < 20:
             last_x = self.game.screen.get_width() + self.camera_shift.x
             last_y = self.game.screen.get_height() / 2 + self.camera_shift.y
             last_width = min(self.widths)
@@ -54,7 +60,7 @@ class TestScene(Scene):
                 y = last_y * (random.randint(50, 110) / 100)
                 if int(y) not in self.y_range:
                     y = self.game.screen.get_height() / 2 + self.camera_shift.y
-                platform = TestStaticBody(self, x, int(y), width)
+                platform = Platform(self, x, int(y), width, width)
                 last_x = x
                 last_y = y
                 last_width = width

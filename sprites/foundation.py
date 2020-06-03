@@ -15,32 +15,44 @@ class RigidBody(pg.sprite.DirtySprite):
 
         # movement attributes
         self.vel = pg.math.Vector2(0, 0)
+        self.collisions = {"up": [], "down": [], "left": [], "right": []}
+
+    def move(self, dt):
+        self.collisions = {"up": [], "down": [], "left": [], "right": []}
+
+        self.pos.x += self.vel.x * dt
+        self.rect.left = self.pos.x
+        
+        hit_list = pg.sprite.spritecollide(self, self.scene.static_bodies, False)
+        for static_body in hit_list:
+            if self.vel.x < 0: # moving left
+                self.rect.left = static_body.rect.right
+                self.pos.x = self.rect.left
+                self.collisions["left"].append(static_body)
+                self.vel.x = 0
+            elif self.vel.x > 0: # moving right
+                self.rect.right = static_body.rect.left
+                self.pos.x = self.rect.left
+                self.collisions["right"].append(static_body)
+                self.vel.x = 0
+        
+        self.pos.y += self.vel.y * dt
+        self.rect.top = self.pos.y
+
+        hit_list = pg.sprite.spritecollide(self, self.scene.static_bodies, False)
         self.landed = False
-        self.was_landed_last_frame = False
         self.underneath = None
-
-    def update(self, dt, t):
-        # move down from gravity
-
-        # check for static body collisions
-        self.landed = False
-        for sprite in self.scene.static_bodies:
-            if pg.sprite.collide_rect(self, sprite):
-                # if we landed on it
-                if (self.vel.y >= 0) and (self.rect.centerx in range(sprite.rect.left, sprite.rect.right)):
-                    self.rect.bottom = sprite.rect.top
-                    self.vel.y = 0
-                    self.landed = True
-                    self.underneath = sprite
-                
-                # head butted it
-                elif (self.vel.y < 0) and (self.rect.centerx in range(sprite.rect.left, sprite.rect.right)):
-                    self.rect.top = sprite.rect.bottom
-                    self.vel.y = 0
-                
-        if not self.landed:
-             self.vel += pg.math.Vector2(0, self.scene.gravity)#self.vel.lerp(self.scene.terminal_velocity, self.scene.gravity)
-
+        for static_body in hit_list:
+            if self.vel.y < 0: # moving up
+                self.rect.top = static_body.rect.bottom
+                self.pos.y = self.rect.top
+                self.vel.y = 0
+                self.collisions["up"].append(static_body)
+            elif self.vel.y > 0: # moving down
+                self.rect.bottom = static_body.rect.top
+                self.pos.y = self.rect.top
+                self.vel.y = 0
+                self.collisions["down"].append(static_body)
         
 
 class StaticBody(pg.sprite.DirtySprite):

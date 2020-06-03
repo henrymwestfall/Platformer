@@ -2,7 +2,7 @@ import sys
 
 import pygame as pg
 
-from scenes.test_scene import TestScene
+from scenes.test_scene import Demo
 
 class Game:
     def __init__(self):
@@ -24,7 +24,7 @@ class Game:
         self.clock = pg.time.Clock()
         self.time = 0
 
-        self.current_scene = TestScene(self)
+        self.current_scene = Demo(self)
         self.current_scene.start()
 
         self.main_loop()

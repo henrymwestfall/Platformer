@@ -23,7 +23,7 @@ class Scene:
 
         # environment
         self.background = SKY_BLUE
-        self.gravity = 50
+        self.gravity = 3000
         self.terminal_velocity = pg.math.Vector2(0, 1250)
 
         # input
