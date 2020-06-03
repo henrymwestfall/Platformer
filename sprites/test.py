@@ -23,7 +23,23 @@ class Platform(StaticBody):
     def compress_with(self, other, kill=False, delete=False):
         # make sure they align to form a valid rectangle
 
-        if not pg.sprite.collide_rect(self, other):
+        expanded = self.rect
+        expanded.width += 2
+        expanded.height += 2
+        expanded.left -= 1
+        expanded.right += 1
+        expanded.top -= 1
+        expanded.bottom += 1
+
+        other_expanded = other.rect
+        other_expanded.width += 2
+        other_expanded.height += 2
+        other_expanded.left -= 1
+        other_expanded.right += 1
+        other_expanded.top -= 1
+        other_expanded.bottom += 1
+        
+        if not expanded.colliderect(other):
             return [self, other]
 
         if (self.rect.left == other.rect.left) and (self.rect.width == other.rect.width):
@@ -41,19 +57,14 @@ class Platform(StaticBody):
         
         new_platform = Platform(self.scene, x, y, width, height)
         
-        if (kill == delete):
-            if kill:
-                self.kill()
-                other.kill()
+        if kill:
+            self.kill()
+            other.kill()
             if delete:
                 del other
                 del self
-        else:
-            print("Warning: Platform.compress_with arguments kill and delete must have same value")
-        
+            
         return [new_platform]
-
-        
 
 
 class Player(RigidBody):
