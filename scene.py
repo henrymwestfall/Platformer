@@ -2,7 +2,7 @@ import random
 
 import pygame as pg
 
-from colors import SKY_BLUE, BLACK
+from colors import *
 
 class Scene:
     def __init__(self, name, game):
@@ -22,7 +22,7 @@ class Scene:
         self.particles = pg.sprite.Group() # unaffected by anything
 
         # environment
-        self.background = SKY_BLUE
+        self.background = BLACK
         self.gravity = 3000
         self.terminal_velocity = pg.math.Vector2(0, 1250)
 

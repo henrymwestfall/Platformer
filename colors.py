@@ -6,3 +6,4 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
 SKY_BLUE = (128, 198, 229)
+FOREST_GREEN = (34, 139, 34)

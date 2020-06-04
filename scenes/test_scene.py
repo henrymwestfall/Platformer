@@ -1,10 +1,13 @@
+import random
+import time
+
 import pygame as pg
+import numpy as np
 
 from scene import Scene
 from sprites.test import Platform, Player
+from noise import perlin
 
-import random
-import time
 
 class Demo(Scene):
     def __init__(self, game):
@@ -19,16 +22,21 @@ class Demo(Scene):
 
     def start(self):
         pg.display.set_caption("Demo")
+        
         for i in range(10):
             Platform(self, i * 2000 + 550, 350, 2000, 32)
-        Platform(self, 400, 200, 32, 100)
-        Platform(self, 500, 200, 32, 100)
-        
-        a = Platform(self, 400, 100, 32, 32)
-        b = Platform(self, 400, 132, 32, 32)
-        print(a.compress_with(b, True, True))
+        Platform(self, 400, 200, 32, 500)
+        Platform(self, 500, 200, 32, 500)
 
-        self.player = Player(self, 450, 100)
+        a = Platform(self, 300, 100, 32, 32)
+        b = Platform(self, 300, 132, 32, 32)
+        c = Platform(self, 332, 132, 32, 32)
+        d = Platform(self, 332, 100, 32, 32)
+        e = a.compress_with(b, True, True)[0]
+        f = c.compress_with(d, True, True)[0]
+        e.compress_with(f, True, True)
+
+        self.player = Player(self, 450, 0)
         self.camera_focus = self.player
 
     def handle_events(self):
@@ -37,7 +45,7 @@ class Demo(Scene):
 
     def update(self, dt, t):
         super().update(dt, t)
-
+        
         to_the_right = 0
         for platform in self.static_bodies:
             if platform.rect.x >= self.player.rect.x:

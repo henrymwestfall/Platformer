@@ -3,6 +3,7 @@ import sys
 import pygame as pg
 
 from scenes.test_scene import Demo
+from scenes.western_forest import WesternForest
 
 class Game:
     def __init__(self):
@@ -24,7 +25,7 @@ class Game:
         self.clock = pg.time.Clock()
         self.time = 0
 
-        self.current_scene = Demo(self)
+        self.current_scene = WesternForest(self)
         self.current_scene.start()
 
         self.main_loop()

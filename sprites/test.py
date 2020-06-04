@@ -10,10 +10,10 @@ class Platform(StaticBody):
         StaticBody.__init__(self, scene)
 
         self.image = pg.Surface([width, height])
-        self.image.fill(BLACK)
+        self.image.fill(FOREST_GREEN)
         internal_image = pg.Surface([width - 8, height - 8])
-        internal_image.fill(GREEN)
-        rect = pg.Rect(4, 4, width - 4, 28)
+        internal_image.fill(FOREST_GREEN)
+        rect = pg.Rect(4, 4, width - 4, height - 4)
         self.image.blit(internal_image, rect)
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
@@ -71,8 +71,8 @@ class Player(RigidBody):
     def __init__(self, scene, x, y):
         RigidBody.__init__(self, scene)
 
-        self.image = pg.Surface([32, 32])
-        self.image.fill(BLACK)
+        self.image = pg.Surface([32, 52])
+        self.image.fill(BLUE)
         internal_image = pg.Surface([24, 24])
         internal_image.fill(RED)
         rect = pg.Rect(4, 4, 28, 28)
@@ -88,15 +88,16 @@ class Player(RigidBody):
         self.jump_strength = 1000
         self.jump_cut = 0.5
 
-        self.grip = 100
+        self.climb = 250
 
     def update(self, dt, t):
         landed = len(self.collisions["down"]) > 0
         touching_left = len(self.collisions["left"]) > 0
         touching_right = len(self.collisions["right"]) > 0
 
+        # apply gravity
         if not landed:
-             self.vel += pg.math.Vector2(0, self.scene.gravity) * dt
+            self.vel += pg.math.Vector2(0, self.scene.gravity) * dt
 
         # jump
         if landed and self.scene.keys_pressed[pg.K_UP]:
@@ -104,14 +105,27 @@ class Player(RigidBody):
         elif self.vel.y < 0 and not self.scene.keys_pressed[pg.K_UP]:
             self.vel.y *= self.jump_cut
 
+        # handle climbing
+        
+        if not landed and (touching_left or touching_right):
+            self.vel.y = 0
+            if self.scene.keys_pressed[pg.K_UP]:
+                self.vel.y = -self.climb
+            elif self.scene.keys_pressed[pg.K_DOWN]:
+                self.vel.y = self.climb
+        
         # move left/right
         self.moving = False
-        if self.scene.keys_pressed[pg.K_RIGHT]:
-            self.vel.x = self.vel.lerp(pg.math.Vector2(self.speed, 0), self.acc).x
-            self.moving = True
-        if self.scene.keys_pressed[pg.K_LEFT]:
-            self.vel.x = self.vel.lerp(pg.math.Vector2(-self.speed, 0), self.acc).x
-            self.moving = True
+
+        if self.scene.keys_pressed[pg.K_RIGHT] ^ self.scene.keys_pressed[pg.K_LEFT]:
+            if self.scene.keys_pressed[pg.K_RIGHT]:
+                self.vel.x = self.vel.lerp(pg.math.Vector2(self.speed, 0), self.acc).x
+                self.moving = True
+            elif self.scene.keys_pressed[pg.K_LEFT]:
+                self.vel.x = self.vel.lerp(pg.math.Vector2(-self.speed, 0), self.acc).x
+                self.moving = True
+        else:
+            self.vel.x = 0
 
         if landed and not self.moving:
             friction = self.collisions["down"][0].friction * math.copysign(1, -self.vel.x)
@@ -121,15 +135,16 @@ class Player(RigidBody):
             else:
                 self.vel.x = 0
 
-        self.image = pg.Surface([32, 32])
-        self.image.fill(BLACK)
+        self.image = pg.Surface([self.rect.width, self.rect.height])
+        self.image.fill(SKY_BLUE)
+        """
         internal_image = pg.Surface([24, 24])
         if self.moving:
             internal_image.fill(RED)
         else:
             internal_image.fill(BLUE)
         rect = pg.Rect(4, 4, 28, 28)
-        self.image.blit(internal_image, rect)
+        self.image.blit(internal_image, rect)"""
 
         if self.scene.keys_pressed[pg.K_SPACE]:
             self.scene.shake_screen(t, 50, 2)
