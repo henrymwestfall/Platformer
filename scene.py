@@ -20,6 +20,7 @@ class Scene:
         self.static_bodies = pg.sprite.Group() # immobile platforms
         self.projectiles = pg.sprite.Group() # unaffected by gravity
         self.particles = pg.sprite.Group() # unaffected by anything
+        self.hud = pg.sprite.Group()
 
         # environment
         self.background = BLACK
@@ -55,12 +56,17 @@ class Scene:
         self.draw_group(self.projectiles)
         self.draw_group(self.rigid_bodies)
         self.draw_group(self.particles)
+        self.draw_group(self.hud)
 
     def draw_group(self, group):
         for e in group:
-            rect = pg.Rect(e.rect)
-            rect.x -= self.camera_shift.x
-            rect.y -= self.camera_shift.y
+            if group == self.hud:
+                rect = e.rect
+            else:
+                rect = pg.Rect(e.rect)
+                rect.x -= self.camera_shift.x
+                rect.y -= self.camera_shift.y
+            
             if rect.colliderect(self.screen_rect):
                 self.screen.blit(e.image, rect)
                 
@@ -103,6 +109,8 @@ class Scene:
             sprite.update(dt, t)
         for particle in self.particles:
             particle.update(dt, t)
+        for hud_e in self.hud:
+            hud_e.update(dt, t)
 
     def shake_screen(self, t, magnitude, duration):
         self.screen_shake_start = t

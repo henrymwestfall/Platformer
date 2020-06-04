@@ -15,6 +15,9 @@ TILE_COLOR = (34, 139, 34)
 TILE = pg.Surface([TILE_SIZE, TILE_SIZE])
 TILE.fill(TILE_COLOR)
 
+COIN = pg.Surface([16, 16])
+pg.draw.circle(COIN, (255, 255, 0), (8, 8), 8)
+
 MAP_NAME = "Western Forest"
 
 pg.init()
@@ -95,6 +98,16 @@ while True:
     if pressed[pg.K_c]: # clear
         current_map = [[0 for y in range(MAP_HEIGHT)] for x in range(MAP_WIDTH)]
 
+    if pressed[pg.K_r]: # relic
+        focus = pg.math.Vector2(mouse_pos)
+        focus.x = (focus.x - camera_x) // TILE_SIZE
+        focus.y = (focus.y - camera_y) // TILE_SIZE
+
+        try:
+            current_map[int(focus.x)][int(focus.y)] = 2
+        except IndexError:
+            pass
+
     if pressed[pg.K_f]: # fill recursively
         if not cleared:
             focus = pg.math.Vector2(mouse_pos)
@@ -138,10 +151,12 @@ while True:
     # draw the tiles
     for x, row in enumerate(current_map):
         for y, cell in enumerate(row):
+            rect = pg.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
+            rect.x += camera_x
+            rect.y += camera_y
             if cell == 1:
-                rect = pg.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
-                rect.x += camera_x
-                rect.y += camera_y
                 screen.blit(TILE, rect)
+            elif cell == 2:
+                screen.blit(COIN, rect)
     
     pg.display.flip()

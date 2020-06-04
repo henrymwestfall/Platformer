@@ -67,6 +67,39 @@ class Platform(StaticBody):
         return [new_platform]
 
 
+class Coin(RigidBody):
+    def __init__(self, scene, x, y):
+        super().__init__(scene)
+
+        self.image = pg.Surface([16, 16])
+        pg.draw.circle(self.image, (255, 255, 0), (8, 8), 8)
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+
+class ScoreTracker(pg.sprite.DirtySprite):
+    def __init__(self, scene, x, y):
+        super().__init__(scene.hud)
+
+        self.scene = scene
+
+        self.max_score = len([body for body in self.scene.rigid_bodies if isinstance(body, Coin)])
+        self.current_score = 0
+
+        self.image = pg.Surface([20 * self.max_score, 20])
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+    def update(self, dt, t):
+        self.current_score = self.scene.player.score
+
+        self.image.fill(pg.Color(0, 0, 0, 0)) # transparent
+        for i in range(self.max_score):
+            if i < self.current_score:
+                pg.draw.circle(self.image, (255, 255, 0), (20 * i + 10, 10), 8)
+            else:
+                pg.draw.circle(self.image, (121, 121, 121), (20 * i + 10, 10), 8)
+
 class Player(RigidBody):
     def __init__(self, scene, x, y):
         RigidBody.__init__(self, scene)
@@ -89,6 +122,8 @@ class Player(RigidBody):
         self.jump_cut = 0.5
 
         self.climb = 250
+
+        self.score = 0
 
     def update(self, dt, t):
         landed = len(self.collisions["down"]) > 0
@@ -157,6 +192,12 @@ class Player(RigidBody):
         elif rect_pos.x > 0:
             rect_pos.x = math.floor(rect_pos.x)
         self.rect.topleft = rect_pos
+
+        collided_rigid_bodies = pg.sprite.spritecollide(self, self.scene.rigid_bodies, False)
+        for body in collided_rigid_bodies:
+            if isinstance(body, Coin):
+                self.score += 1
+                body.kill()
 
 
 class TestParticle(Particle):

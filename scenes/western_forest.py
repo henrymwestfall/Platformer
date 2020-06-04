@@ -7,7 +7,7 @@ import pygame as pg
 import numpy as np
 
 from scene import Scene
-from sprites.test import Platform, Player
+from sprites.test import Platform, Player, Coin, ScoreTracker
 
 class WesternForest(Scene):
     def __init__(self, game):
@@ -23,6 +23,9 @@ class WesternForest(Scene):
                 for y, cell in enumerate(line):
                     if int(cell) == 1:
                         Platform(self, x * 64, y * 64, 64, 64)
+                    elif int(cell) == 2:
+                        Coin(self, x * 64, y * 64)
+        ScoreTracker(self, 0, 0)
 
         self.kill_depth = 1000
                             
