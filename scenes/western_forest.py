@@ -16,15 +16,16 @@ class WesternForest(Scene):
         self.player = None
         self.camera_focus = self.player
 
+        self.tile_size = 64
         path = os.path.join(os.path.split(os.path.split(__file__)[0])[0], "maps", "Western Forest.pkl")
         with open(path, "rb") as f:
             raw_map = pickle.load(f)
             for x, line in enumerate(raw_map):
                 for y, cell in enumerate(line):
                     if int(cell) == 1:
-                        Platform(self, x * 64, y * 64, 64, 64)
+                        Platform(self, x * self.tile_size, y * self.tile_size, self.tile_size, self.tile_size)
                     elif int(cell) == 2:
-                        Coin(self, x * 64, y * 64)
+                        Coin(self, x * self.tile_size, y * self.tile_size)
         ScoreTracker(self, 0, 0)
 
         self.kill_depth = 1000
@@ -33,7 +34,7 @@ class WesternForest(Scene):
     def start(self):
         pg.display.set_caption("Demo")
 
-        self.player = Player(self, 1000, 500)
+        self.player = Player(self, 16 * self.tile_size, 8 * self.tile_size)
         self.camera_focus = self.player
 
         self.kill_depth = max([p.rect.bottom for p in self.static_bodies]) + 200

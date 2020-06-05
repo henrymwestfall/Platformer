@@ -159,8 +159,6 @@ class Player(RigidBody):
             elif self.scene.keys_pressed[pg.K_LEFT]:
                 self.vel.x = self.vel.lerp(pg.math.Vector2(-self.speed, 0), self.acc).x
                 self.moving = True
-        else:
-            self.vel.x = 0
 
         if landed and not self.moving:
             friction = self.collisions["down"][0].friction * math.copysign(1, -self.vel.x)
