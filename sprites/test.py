@@ -135,28 +135,28 @@ class Player(RigidBody):
             self.vel += pg.math.Vector2(0, self.scene.gravity) * dt
 
         # jump
-        if landed and self.scene.keys_pressed[pg.K_UP]:
+        if landed and self.scene.keys_pressed[pg.K_w]:
             self.vel.y = -self.jump_strength
-        elif self.vel.y < 0 and not self.scene.keys_pressed[pg.K_UP]:
+        elif self.vel.y < 0 and not self.scene.keys_pressed[pg.K_w]:
             self.vel.y *= self.jump_cut
 
         # handle climbing
         
         if not landed and (touching_left or touching_right):
             self.vel.y = 0
-            if self.scene.keys_pressed[pg.K_UP]:
+            if self.scene.keys_pressed[pg.K_w]:
                 self.vel.y = -self.climb
-            elif self.scene.keys_pressed[pg.K_DOWN]:
+            elif self.scene.keys_pressed[pg.K_s]:
                 self.vel.y = self.climb
         
         # move left/right
         self.moving = False
 
-        if self.scene.keys_pressed[pg.K_RIGHT] ^ self.scene.keys_pressed[pg.K_LEFT]:
-            if self.scene.keys_pressed[pg.K_RIGHT]:
+        if self.scene.keys_pressed[pg.K_d] ^ self.scene.keys_pressed[pg.K_a]:
+            if self.scene.keys_pressed[pg.K_d]:
                 self.vel.x = self.vel.lerp(pg.math.Vector2(self.speed, 0), self.acc).x
                 self.moving = True
-            elif self.scene.keys_pressed[pg.K_LEFT]:
+            elif self.scene.keys_pressed[pg.K_a]:
                 self.vel.x = self.vel.lerp(pg.math.Vector2(-self.speed, 0), self.acc).x
                 self.moving = True
 
