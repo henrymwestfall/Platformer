@@ -7,7 +7,11 @@ import pygame as pg
 import numpy as np
 
 from scene import Scene
-from sprites.test import Platform, Player, Coin, ScoreTracker
+#from sprites.test import Platform, Player, Coin, ScoreTracker
+from sprites.platform import Platform
+from sprites.player import Player
+from sprites.collectables import Coin
+from sprites.score_tracker import ScoreTracker
 
 class WesternForest(Scene):
     def __init__(self, game):

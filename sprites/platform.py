@@ -1,0 +1,66 @@
+import pygame as pg
+
+from colors import *
+from .foundation import StaticBody
+
+
+class Platform(StaticBody):
+    def __init__(self, scene, x, y, width, height):
+        StaticBody.__init__(self, scene)
+
+        self.image = pg.Surface([width, height])
+        self.image.fill(FOREST_GREEN)
+        internal_image = pg.Surface([width - 8, height - 8])
+        internal_image.fill(FOREST_GREEN)
+        rect = pg.Rect(4, 4, width - 4, height - 4)
+        self.image.blit(internal_image, rect)
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+
+        self.friction = 100
+
+    def compress_with(self, other, kill=False, delete=False):
+        # make sure they align to form a valid rectangle
+
+        expanded = self.rect
+        expanded.width += 2
+        expanded.height += 2
+        expanded.left -= 1
+        expanded.right += 1
+        expanded.top -= 1
+        expanded.bottom += 1
+
+        other_expanded = other.rect
+        other_expanded.width += 2
+        other_expanded.height += 2
+        other_expanded.left -= 1
+        other_expanded.right += 1
+        other_expanded.top -= 1
+        other_expanded.bottom += 1
+        
+        if not expanded.colliderect(other):
+            return [self, other]
+
+        if (self.rect.left == other.rect.left) and (self.rect.width == other.rect.width):
+            height = max([self.rect.bottom, other.rect.bottom]) - min([self.rect.top, other.rect.top])
+            y = min([self.rect.top, other.rect.top])
+            x = self.rect.x
+            width = self.rect.width
+        elif (self.rect.top == other.rect.top) and (self.rect.height == other.rect.height):
+            width = max([self.rect.right, other.rect.right]) - min([self.rect.left, other.rect.left])
+            x = min([self.rect.left, other.rect.left])
+            y = self.rect.y
+            height = self.rect.height
+        else:
+            return [self, other]
+        
+        new_platform = Platform(self.scene, x, y, width, height)
+        
+        if kill:
+            self.kill()
+            other.kill()
+            if delete:
+                del other
+                del self
+            
+        return [new_platform]

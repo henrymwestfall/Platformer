@@ -5,9 +5,9 @@ import pygame as pg
 import numpy as np
 
 from scene import Scene
-from sprites.test import Platform, Player
 from noise import perlin
-
+from sprites.platform import Platform
+from sprites.player import Player
 
 class Demo(Scene):
     def __init__(self, game):
