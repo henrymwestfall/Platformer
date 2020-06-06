@@ -18,7 +18,6 @@ class WesternForest(Scene):
         super().__init__("Western Forest", game)
 
         self.player = None
-        self.camera_focus = self.player
 
         self.tile_size = 64
         path = os.path.join(os.path.split(os.path.split(__file__)[0])[0], "maps", "Western Forest.pkl")
@@ -39,7 +38,7 @@ class WesternForest(Scene):
         pg.display.set_caption("Demo")
 
         self.player = Player(self, 16 * self.tile_size, 8 * self.tile_size)
-        self.camera_focus = self.player
+        self.camera.set_focus(self.player)
 
         self.kill_depth = max([p.rect.bottom for p in self.static_bodies]) + 200
         print(self.kill_depth)

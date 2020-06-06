@@ -3,6 +3,7 @@ import random
 import pygame as pg
 
 from colors import *
+from camera import Camera
 
 class Scene:
     def __init__(self, name, game):
@@ -32,15 +33,7 @@ class Scene:
         self.keys_pressed = []
 
         # camera
-        self.camera_focus = None
-        self.camera_speed = 500
-        self.camera_acc = 0.05
-        self.camera_drag = 25
-        self.camera_shift = pg.math.Vector2(0, 0)
-
-        self.screen_shake_start = 0
-        self.screen_shake_duration = 0
-        self.screen_shake_magnitude = 0
+        self.camera = Camera(self, 500, 0.04, 25)
 
     
     def handle_events(self):
@@ -63,9 +56,7 @@ class Scene:
             if group == self.hud:
                 rect = e.rect
             else:
-                rect = pg.Rect(e.rect)
-                rect.x -= self.camera_shift.x
-                rect.y -= self.camera_shift.y
+                rect = self.camera.shifted_rect(e.rect)
             
             if rect.colliderect(self.screen_rect):
                 self.screen.blit(e.image, rect)
@@ -74,36 +65,7 @@ class Scene:
         pass
 
     def update(self, dt, t):
-        # update camera
-        if self.camera_focus != None:
-            middle = pg.math.Vector2(self.game.screen.get_width() / 2, self.game.screen.get_height() / 2)
-
-            needs_update = False
-            if self.camera_focus.rect.centerx < middle.x - self.camera_drag: # move camera left
-                needs_update = True
-            elif self.camera_focus.rect.centerx > middle.x + self.camera_drag: # move camera right
-                needs_update = True
-
-            if self.camera_focus.rect.centery < middle.y - self.camera_drag: # move camera up
-                needs_update = True
-            elif self.camera_focus.rect.centery > middle.y + self.camera_drag: # move camera down
-                needs_update = True
-
-            if needs_update:
-                self.camera_shift = self.camera_shift.lerp(pg.math.Vector2(self.camera_focus.rect.center) - middle, self.camera_acc)
-
-        # screenshake
-        if t - self.screen_shake_start >= self.screen_shake_duration:
-                self.screen_shake_duration = 0
-        if self.screen_shake_duration > 0:
-            choices = [self.screen_shake_magnitude, 0]
-            random.shuffle(choices)
-            shift = pg.math.Vector2(choices) * random.choice([-1, 1])
-            progress = (t - self.screen_shake_start) / self.screen_shake_duration
-            shift = shift.lerp(pg.math.Vector2(0, 0), progress)
-
-            self.camera_shift += shift
-            
+        self.camera.update(dt, t)
 
         for sprite in self.rigid_bodies:
             sprite.update(dt, t)
@@ -111,11 +73,6 @@ class Scene:
             particle.update(dt, t)
         for hud_e in self.hud:
             hud_e.update(dt, t)
-
-    def shake_screen(self, t, magnitude, duration):
-        self.screen_shake_start = t
-        self.screen_shake_magnitude = magnitude
-        self.screen_shake_duration = duration
 
     def close(self):
         pass
