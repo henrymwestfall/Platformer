@@ -31,16 +31,22 @@ class Scene:
         # input
         self.events = []
         self.keys_pressed = []
+        self.__mouse_pos = pg.math.Vector2(0, 0)
+        self.mouse_state = (False, False, False)
 
         # camera
         self.camera = Camera(self, 500, 0.04, 25)
+
+    def get_relative_mouse_pos(self):
+        return self.__mouse_pos + self.camera.shift
 
     
     def handle_events(self):
         self.events = pg.event.get()
         self.keys_pressed = pg.key.get_pressed()
+        self.__mouse_pos = pg.math.Vector2(pg.mouse.get_pos())
+        self.mouse_state = pg.mouse.get_pressed()
 
-    
     def draw(self):
         self.screen.fill(self.background)
         

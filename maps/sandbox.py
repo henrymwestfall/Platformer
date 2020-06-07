@@ -18,7 +18,7 @@ TILE.fill(TILE_COLOR)
 COIN = pg.Surface([16, 16])
 pg.draw.circle(COIN, (255, 255, 0), (8, 8), 8)
 
-MAP_NAME = "Western Forest"
+MAP_NAME = "Combat Test"
 
 pg.init()
 screen = pg.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])

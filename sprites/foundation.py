@@ -2,7 +2,7 @@ import pygame as pg
 
 class RigidBody(pg.sprite.DirtySprite):
     def __init__(self, scene):
-        pg.sprite.DirtySprite.__init__(self, scene.children, scene.rigid_bodies)
+        super().__init__(scene.children, scene.rigid_bodies)
 
         self.scene = scene
 
@@ -16,6 +16,9 @@ class RigidBody(pg.sprite.DirtySprite):
         # movement attributes
         self.vel = pg.math.Vector2(0, 0)
         self.collisions = {"up": [], "down": [], "left": [], "right": []}
+
+    def update(self, dt, t):
+        pass
 
     def move(self, dt):
         self.collisions = {"up": [], "down": [], "left": [], "right": []}
@@ -57,7 +60,7 @@ class RigidBody(pg.sprite.DirtySprite):
 
 class StaticBody(pg.sprite.DirtySprite):
     def __init__(self, scene):
-        pg.sprite.DirtySprite.__init__(self, scene.children, scene.static_bodies)
+        super().__init__(scene.children, scene.static_bodies)
 
         self.scene = scene
 
