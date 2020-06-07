@@ -14,9 +14,6 @@ class Player(RigidBody):
 
         self.image = pg.Surface([32, 52])
         self.image.fill(SKY_BLUE)
-        # draw eyes
-        pg.draw.circle(self.image, BLACK, (32 - 8, 8), 4)
-        pg.draw.circle(self.image, BLACK, (8, 8), 4)
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
 

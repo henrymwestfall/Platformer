@@ -45,10 +45,9 @@ class HitBox(RigidBody):
             if hasattr(sprite, "health"):
                 sprite.health -= self.power
 
-                diff = pg.math.Vector2(sprite.rect.centerx) - pg.math.Vector2(self.rect.centerx)
-                angle = math.degrees(math.atan2(diff.x, diff.y))
-                knockback_vector = pg.math.Vector2(self.knockback, 0)
-                knockback_vector.rotate(angle)
+                diff = pg.math.Vector2(sprite.rect.center) - pg.math.Vector2(self.parent.rect.center)
+                diff = diff.normalize()
+                knockback_vector = diff * self.knockback
 
                 sprite.vel += knockback_vector
 
