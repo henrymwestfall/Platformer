@@ -38,7 +38,7 @@ class HitBox(RigidBody):
         # get colliding rigid bodies
         collisions = pg.sprite.spritecollide(self, self.scene.rigid_bodies, False)
         for sprite in collisions:
-            if isinstance(sprite, HitBox) or sprite is self.parent:
+            if isinstance(sprite, HitBox) or (sprite is self.parent):
                 continue
             
             # deal damage and apply knockback
@@ -49,7 +49,8 @@ class HitBox(RigidBody):
                 diff = diff.normalize()
                 knockback_vector = diff * self.knockback
 
-                sprite.vel += knockback_vector
+                sprite.vel = knockback_vector
+                sprite.knock_back_time = 0.5
 
         # determine if we should die
         if t - self.birth >= self.lifetime:

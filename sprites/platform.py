@@ -17,7 +17,7 @@ class Platform(StaticBody):
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
 
-        self.friction = 100
+        self.friction = 50
 
     def compress_with(self, other, kill=False, delete=False):
         # make sure they align to form a valid rectangle

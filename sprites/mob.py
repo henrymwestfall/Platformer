@@ -20,7 +20,7 @@ class Mob(RigidBody):
         self.pos = pg.math.Vector2(self.rect.topleft)
 
         self.speed = 250
-        self.acc = 0.2
+        self.acc = 250
 
         self.jump_strength = 1000
         self.jump_cut = 0.5
@@ -34,8 +34,13 @@ class Mob(RigidBody):
         self.touching_left = False
         self.touching_right = False
         self.climbing = False
+        self.knock_back_time = 0
+
+        self.move_dir = 0
 
         self.target = None
+
+        self.hitbox = HitBox(self, self.rect.x, self.rect.y, self.rect.width, self.rect.height, 0, 2000, 500, 1000, color=RED)
 
     def set_target(self, new_target):
         self.target = new_target
@@ -47,15 +52,22 @@ class Mob(RigidBody):
     def handle_jumping(self):
         pass
 
-    def handle_horz_movement(self):
-        if self.target.rect.centerx >= self.rect.centerx:
-            self.vel.x = self.vel.lerp(pg.math.Vector2(self.speed, 0), self.acc).x
-        else:
-            self.vel.x = self.vel.lerp(pg.math.Vector2(-self.speed, 0), self.acc).x
+    def handle_horz_movement(self, dt):
+        self.move_dir = 0
 
+        self.knock_back_time = max([0, self.knock_back_time - dt])
+        if self.knock_back_time > 0:
+            return
+
+        if self.target.rect.centerx >= self.rect.centerx: # move right
+            self.move_dir = 1
+            self.vel.x = min([self.vel.x + self.acc * dt, self.speed])
+        else:
+            self.move_dir = -1
+            self.vel.x = max([self.vel.x - self.acc * dt, -self.speed])
 
     def apply_friction(self):
-        if self.landed and not self.moving:
+        if self.landed and self.move_dir == 0:
             friction = self.collisions["down"][0].friction * math.copysign(1, -self.vel.x)
             new_vel_x = self.vel.x + friction
             if math.copysign(1, self.vel.x) == math.copysign(1, new_vel_x):
@@ -87,10 +99,10 @@ class Mob(RigidBody):
         self.handle_jumping()
         
         # move left/right
-        self.handle_horz_movement()
+        self.handle_horz_movement(dt)
 
         # apply friction
-        #self.apply_friction()
+        self.apply_friction()
 
         # handle attack
         #self.handle_attack(t)

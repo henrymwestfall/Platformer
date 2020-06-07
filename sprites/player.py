@@ -20,7 +20,7 @@ class Player(RigidBody):
         self.pos = pg.math.Vector2(self.rect.topleft)
 
         self.speed = 600
-        self.acc = 0.05
+        self.acc = 900
 
         self.jump_strength = 1000
         self.jump_cut = 0.5
@@ -37,6 +37,10 @@ class Player(RigidBody):
         self.touching_left = False
         self.touching_right = False
         self.climbing = False
+        self.knock_back_time = 0
+        self.move_dir = 0
+
+        self.health = 100
 
     def apply_gravity(self, dt):
         if not self.landed:
@@ -58,18 +62,24 @@ class Player(RigidBody):
             elif self.scene.keys_pressed[pg.K_s]:
                 self.vel.y = self.climb
 
-    def handle_horz_movement(self):
+    def handle_horz_movement(self, dt):
         self.moving = False
+        self.move_dir = 0
+
+        self.knock_back_time = max([0, self.knock_back_time - dt])
+        if self.knock_back_time > 0:
+            return
+
         if self.scene.keys_pressed[pg.K_d] ^ self.scene.keys_pressed[pg.K_a]:
-            if self.scene.keys_pressed[pg.K_d]:
-                self.vel.x = self.vel.lerp(pg.math.Vector2(self.speed, 0), self.acc).x
-                self.moving = True
+            if self.scene.keys_pressed[pg.K_d]: # move right
+                self.move_dir = 1
+                self.vel.x = min([self.vel.x + self.acc * dt, self.speed])
             elif self.scene.keys_pressed[pg.K_a]:
-                self.vel.x = self.vel.lerp(pg.math.Vector2(-self.speed, 0), self.acc).x
-                self.moving = True
+                self.move_dir = -1
+                self.vel.x = max([self.vel.x - self.acc * dt, -self.speed])
 
     def apply_friction(self):
-        if self.landed and not self.moving:
+        if self.landed and (self.move_dir != math.copysign(1, self.vel.x) or self.move_dir == 0):
             friction = self.collisions["down"][0].friction * math.copysign(1, -self.vel.x)
             new_vel_x = self.vel.x + friction
             if math.copysign(1, self.vel.x) == math.copysign(1, new_vel_x):
@@ -84,7 +94,7 @@ class Player(RigidBody):
                 x = self.rect.right
             else:
                 x = self.rect.left - self.rect.width
-            HitBox(self, x, y, self.rect.width, self.rect.height, t, 0.05, 20, 1000, color=WHITE)
+            HitBox(self, x, y, self.rect.width, self.rect.height, t, 0.05, 20, 500, color=WHITE)
 
             self.last_attack = t
         
@@ -106,7 +116,7 @@ class Player(RigidBody):
         self.handle_climbing()
         
         # move left/right
-        self.handle_horz_movement()
+        self.handle_horz_movement(dt)
 
         # apply friction
         self.apply_friction()
