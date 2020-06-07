@@ -7,6 +7,7 @@ from .foundation import RigidBody
 from .collectables import Coin
 from .hitbox import HitBox
 
+import matplotlib.pyplot as plt
 
 class Player(RigidBody):
     def __init__(self, scene, x, y):
@@ -41,6 +42,15 @@ class Player(RigidBody):
         self.move_dir = 0
 
         self.health = 100
+
+        screen_w = self.scene.screen.get_width()
+        screen_h = self.scene.screen.get_height()
+        self.hitbox_calculation_lines = (
+            lambda x: (screen_h / screen_w) * x, # top left to bottom right
+            lambda x: -(screen_h / screen_w) * x + screen_h # bottom left to top right
+        )
+        self.hitbox_length = self.rect.height # long side of the hitbox
+        self.hitbox_width = self.rect.width # short side of the hitbox
 
     def apply_gravity(self, dt):
         if not self.landed:
@@ -94,7 +104,31 @@ class Player(RigidBody):
                 x = self.rect.right
             else:
                 x = self.rect.left - self.rect.width
-            HitBox(self, x, y, self.rect.width, self.rect.height, t, 0.05, 20, 500, color=WHITE)
+
+            mp = self.scene.get_window_mouse_pos()
+            tl_br, bl_tr = self.hitbox_calculation_lines
+            mouse_pos_test_results = (
+                mp.y <= tl_br(mp.x) and mp.y <= bl_tr(mp.x),  # bottom quadrant
+                mp.y >= tl_br(mp.x) and mp.y <= bl_tr(mp.x), # right quadrant
+                mp.y <= tl_br(mp.x) and mp.y >= bl_tr(mp.x), # left quadrant
+                mp.y >= tl_br(mp.x) and mp.y >= bl_tr(mp.x) # top quadrant
+            )
+
+            for quadrant, result in enumerate(mouse_pos_test_results):
+                if result == True:
+                    break
+            else:
+                print("Warning: mouse position failed all tests. Debugging necessary.")
+                return
+            
+            if quadrant == 0: # top quadrant
+                HitBox(self, self.rect.centerx - self.hitbox_length // 2, self.rect.top - self.hitbox_width, self.hitbox_length, self.hitbox_width, t, 0.05, 20, 500, color=WHITE)
+            elif quadrant == 1: # left quadrant
+                HitBox(self, self.rect.left - self.hitbox_width, self.rect.top, self.hitbox_width, self.hitbox_length, t, 0.05, 20, 500, color=WHITE)
+            elif quadrant == 2: # right quadrant
+                HitBox(self, self.rect.right, self.rect.top, self.hitbox_width, self.hitbox_length, t, 0.05, 20, 500, color=WHITE)
+            else: # bottom quadrant
+                HitBox(self, self.rect.centerx - self.hitbox_length // 2,  self.rect.bottom, self.hitbox_length, self.hitbox_width, t, 0.05, 20, 500, color=WHITE)
 
             self.last_attack = t
         

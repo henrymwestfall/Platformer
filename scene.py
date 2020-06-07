@@ -40,6 +40,8 @@ class Scene:
     def get_relative_mouse_pos(self):
         return self.__mouse_pos + self.camera.shift
 
+    def get_window_mouse_pos(self):
+        return self.__mouse_pos
     
     def handle_events(self):
         self.events = pg.event.get()
