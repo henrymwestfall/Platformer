@@ -47,7 +47,7 @@ class HitBox(RigidBody):
 
                 diff = pg.math.Vector2(sprite.rect.center) - pg.math.Vector2(self.parent.rect.centerx, self.parent.rect.centery + 100)
                 diff = diff.normalize()
-                knockback_vector = diff * (self.knockback + self.parent.vel.length())
+                knockback_vector = diff * (self.knockback) + self.parent.vel
 
                 sprite.vel = knockback_vector
 
