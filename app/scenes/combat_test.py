@@ -22,11 +22,7 @@ class CombatTest(Scene):
 
         self.tile_size = 64
         raw_map = load_tile_map("CombatTest")
-        for x, line in enumerate(raw_map):
-            for y, cell in enumerate(line):
-                if int(cell) == 1:
-                    Platform(self, x * self.tile_size, y * self.tile_size, self.tile_size, self.tile_size)
-        
+        self.express_map(raw_map)
 
     def start(self):
         pg.display.set_caption("Combat Test")

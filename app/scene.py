@@ -10,13 +10,15 @@ import pygame as pg
 
 from colors import *
 from camera import Camera
+from sprites.platform import Platform
 
-def load_tile_map(name):
+def load_tile_map(name, *subdirs):
     if ".pkl" in name:
         file_name = name
     else:
         file_name = name + ".pkl"
-    text = pkg_resources.read_binary("maps", file_name)
+    path = os.path.join(subdirs, "maps")
+    text = pkg_resources.read_binary(path, file_name)
     raw_data = pickle.loads(text)
     return raw_data
 
@@ -37,6 +39,7 @@ class Scene:
         self.projectiles = pg.sprite.Group() # unaffected by gravity
         self.particles = pg.sprite.Group() # unaffected by anything
         self.hud = pg.sprite.Group()
+        self.triggers = pg.sprite.Group() # not drawn
 
         # environment
         self.background = BLACK
@@ -51,6 +54,12 @@ class Scene:
 
         # camera
         self.camera = Camera(self, 500, 0.04, 25)
+
+    def express_map(self, tile_map, tile_size=64):
+        for x, line in enumerate(tile_map):
+            for y, cell in enumerate(line):
+                if int(cell) == 1:
+                    Platform(self, x * tile_size, y * tile_size, tile_size, tile_size)
 
     def get_relative_mouse_pos(self):
         return self.__mouse_pos + self.camera.shift
@@ -96,6 +105,8 @@ class Scene:
             particle.update(dt, t)
         for hud_e in self.hud:
             hud_e.update(dt, t)
+        for trigger in self.triggers:
+            trigger.update(dt, t)
 
     def close(self):
         pass
@@ -105,3 +116,13 @@ class Area(Scene):
     def __init__(self, name, game):
         super().__init__(name, game)
 
+        self.scenes = []
+        path = os.path.join(os.path.dirname(__file__), "maps", self.name)
+        for i, map_file in enumerate(os.listdir(path)):
+            s = Scene(f"{self.name}-{i + 1}", self.game)
+
+            map_data = load_tile_map(map_file, self.name)
+            s.express_map(map_data)
+
+            self.scenes.append(s)
+        
