@@ -2,7 +2,6 @@ import random
 import time
 
 import pygame as pg
-import numpy as np
 
 from scene import Scene
 from sprites.platform import Platform

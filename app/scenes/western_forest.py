@@ -4,7 +4,6 @@ import os
 import pickle
 
 import pygame as pg
-import numpy as np
 
 from scene import Scene
 from sprites.platform import Platform
