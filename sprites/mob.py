@@ -27,14 +27,14 @@ class Mob(RigidBody):
 
         self.attack_cooldown = 0.4
         self.last_attack = 0
-
+        
         self.health = 200
 
         self.landed = False
         self.touching_left = False
         self.touching_right = False
         self.climbing = False
-        self.knock_back_time = 0
+        self.being_knocked_back = False
 
         self.move_dir = 0
 
@@ -54,9 +54,10 @@ class Mob(RigidBody):
 
     def handle_horz_movement(self, dt):
         self.move_dir = 0
+        
+        self.being_knocked_back = (not self.landed) and self.being_knocked_back
 
-        self.knock_back_time = max([0, self.knock_back_time - dt])
-        if self.knock_back_time > 0:
+        if self.being_knocked_back:
             return
 
         if self.target.rect.centerx >= self.rect.centerx: # move right
@@ -82,7 +83,7 @@ class Mob(RigidBody):
                 x = self.rect.right
             else:
                 x = self.rect.left - self.rect.width
-            HitBox(self, x, y, self.rect.width, self.rect.height, t, 0.05, 20, 200, color=WHITE)
+            HitBox(self, x, y, self.rect.width, self.rect.height, t, 0.05, 20, 1000, color=WHITE)
 
             self.last_attack = t
 
@@ -115,3 +116,7 @@ class Mob(RigidBody):
         elif rect_pos.x > 0:
             rect_pos.x = math.floor(rect_pos.x)
         self.rect.topleft = rect_pos
+
+        if self.health <= 0:
+            self.kill()
+            self.hitbox.kill()

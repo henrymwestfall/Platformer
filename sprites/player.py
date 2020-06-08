@@ -38,7 +38,7 @@ class Player(RigidBody):
         self.touching_left = False
         self.touching_right = False
         self.climbing = False
-        self.knock_back_time = 0
+        self.being_knocked_back = False
         self.move_dir = 0
 
         self.health = 100
@@ -49,8 +49,8 @@ class Player(RigidBody):
             lambda x: (screen_h / screen_w) * x, # top left to bottom right
             lambda x: -(screen_h / screen_w) * x + screen_h # bottom left to top right
         )
-        self.hitbox_length = self.rect.height # long side of the hitbox
-        self.hitbox_width = self.rect.width # short side of the hitbox
+        self.hitbox_length = int(self.rect.height * 1.5) # long side of the hitbox
+        self.hitbox_width = int(self.rect.width * 1.5) # short side of the hitbox
 
     def apply_gravity(self, dt):
         if not self.landed:
@@ -76,8 +76,9 @@ class Player(RigidBody):
         self.moving = False
         self.move_dir = 0
 
-        self.knock_back_time = max([0, self.knock_back_time - dt])
-        if self.knock_back_time > 0:
+        self.being_knocked_back = (not self.landed) and self.being_knocked_back
+
+        if self.being_knocked_back:
             return
 
         if self.scene.keys_pressed[pg.K_d] ^ self.scene.keys_pressed[pg.K_a]:
@@ -124,9 +125,9 @@ class Player(RigidBody):
             if quadrant == 0: # top quadrant
                 HitBox(self, self.rect.centerx - self.hitbox_length // 2, self.rect.top - self.hitbox_width, self.hitbox_length, self.hitbox_width, t, 0.05, 20, 500, color=WHITE)
             elif quadrant == 1: # left quadrant
-                HitBox(self, self.rect.left - self.hitbox_width, self.rect.top, self.hitbox_width, self.hitbox_length, t, 0.05, 20, 500, color=WHITE)
+                HitBox(self, self.rect.left - self.hitbox_width, self.rect.centery - self.hitbox_length // 2, self.hitbox_width, self.hitbox_length, t, 0.05, 20, 500, color=WHITE)
             elif quadrant == 2: # right quadrant
-                HitBox(self, self.rect.right, self.rect.top, self.hitbox_width, self.hitbox_length, t, 0.05, 20, 500, color=WHITE)
+                HitBox(self, self.rect.right, self.rect.centery - self.hitbox_length // 2, self.hitbox_width, self.hitbox_length, t, 0.05, 20, 500, color=WHITE)
             else: # bottom quadrant
                 HitBox(self, self.rect.centerx - self.hitbox_length // 2,  self.rect.bottom, self.hitbox_length, self.hitbox_width, t, 0.05, 20, 500, color=WHITE)
 

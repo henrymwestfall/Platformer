@@ -28,10 +28,17 @@ class CombatTest(Scene):
     def start(self):
         pg.display.set_caption("Combat Test")
 
-        self.player = Player(self, self.screen.get_width() // 3, 300)
+        self.player = Player(self, self.screen.get_width() // 2, 300)
         m = Mob(self, 2 * self.screen.get_width() // 3, 300)
         m.set_target(self.player)
         self.camera.set_focus(self.player)
 
     def update(self, dt, t):
         super().update(dt, t)
+
+        for body in self.rigid_bodies:
+            if isinstance(body, Mob):
+                break
+        else:
+            m = Mob(self, 2 * self.screen.get_width() // 3, 300)
+            m.set_target(self.player)

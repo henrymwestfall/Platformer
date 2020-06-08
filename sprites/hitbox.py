@@ -45,12 +45,11 @@ class HitBox(RigidBody):
             if hasattr(sprite, "health"):
                 sprite.health -= self.power
 
-                diff = pg.math.Vector2(sprite.rect.center) - pg.math.Vector2(self.parent.rect.center)
+                diff = pg.math.Vector2(sprite.rect.center) - pg.math.Vector2(self.parent.rect.centerx, self.parent.rect.centery + 100)
                 diff = diff.normalize()
-                knockback_vector = diff * self.knockback
+                knockback_vector = diff * (self.knockback + self.parent.vel.length())
 
                 sprite.vel = knockback_vector
-                sprite.knock_back_time = 0.5
 
         # determine if we should die
         if t - self.birth >= self.lifetime:
