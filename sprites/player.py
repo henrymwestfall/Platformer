@@ -6,17 +6,12 @@ from colors import *
 from .foundation import RigidBody
 from .collectables import Coin
 from .hitbox import HitBox
+from .character import Character
 
-import matplotlib.pyplot as plt
 
-class Player(RigidBody):
+class Player(Character):
     def __init__(self, scene, x, y):
-        super().__init__(scene)
-
-        self.image = pg.Surface([32, 52])
-        self.image.fill(SKY_BLUE)
-        self.rect = self.image.get_rect()
-        self.rect.center = (x, y)
+        super().__init__(scene, x, y, 32, 52, fill_color=SKY_BLUE)
 
         self.pos = pg.math.Vector2(self.rect.topleft)
 
@@ -29,16 +24,10 @@ class Player(RigidBody):
         self.climb = 250
 
         self.attack_cooldown = 0.2
-        self.last_attack = 0
         self.mouse_has_lifted = True
 
         self.score = 0
 
-        self.landed = False
-        self.touching_left = False
-        self.touching_right = False
-        self.climbing = False
-        self.being_knocked_back = False
         self.move_dir = 0
 
         self.health = 100
@@ -51,10 +40,6 @@ class Player(RigidBody):
         )
         self.hitbox_length = int(self.rect.height * 1.5) # long side of the hitbox
         self.hitbox_width = int(self.rect.width * 1.5) # short side of the hitbox
-
-    def apply_gravity(self, dt):
-        if not self.landed:
-            self.vel += pg.math.Vector2(0, self.scene.gravity) * dt
 
     def handle_jumping(self):
         if self.landed and self.scene.keys_pressed[pg.K_w]:
@@ -88,15 +73,6 @@ class Player(RigidBody):
             elif self.scene.keys_pressed[pg.K_a]:
                 self.move_dir = -1
                 self.vel.x = max([self.vel.x - self.acc * dt, -self.speed])
-
-    def apply_friction(self):
-        if self.landed and (self.move_dir != math.copysign(1, self.vel.x) or self.move_dir == 0):
-            friction = self.collisions["down"][0].friction * math.copysign(1, -self.vel.x)
-            new_vel_x = self.vel.x + friction
-            if math.copysign(1, self.vel.x) == math.copysign(1, new_vel_x):
-                self.vel.x = new_vel_x
-            else:
-                self.vel.x = 0
 
     def handle_attack(self, t):
         if self.scene.mouse_state[0] and self.mouse_has_lifted and t - self.last_attack >= self.attack_cooldown: # left click

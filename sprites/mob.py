@@ -6,21 +6,17 @@ from colors import *
 from .foundation import RigidBody
 from .collectables import Coin
 from .hitbox import HitBox
+from .character import Character
 
 
-class Mob(RigidBody):
+class Mob(Character):
     def __init__(self, scene, x, y):
-        super().__init__(scene)
-
-        self.image = pg.Surface([32, 52])
-        self.image.fill(RED)
-        self.rect = self.image.get_rect()
-        self.rect.center = (x, y)
+        super().__init__(scene, x, y, 32, 52, fill_color=RED)
 
         self.pos = pg.math.Vector2(self.rect.topleft)
 
         self.speed = 250
-        self.acc = 250
+        self.acc = 500
 
         self.jump_strength = 1000
         self.jump_cut = 0.5
@@ -30,24 +26,14 @@ class Mob(RigidBody):
         
         self.health = 200
 
-        self.landed = False
-        self.touching_left = False
-        self.touching_right = False
-        self.climbing = False
-        self.being_knocked_back = False
-
         self.move_dir = 0
 
         self.target = None
 
-        self.hitbox = HitBox(self, self.rect.x, self.rect.y, self.rect.width, self.rect.height, 0, 2000, 500, 1000, color=RED)
+        self.hitbox = HitBox(self, self.rect.x, self.rect.y, self.rect.width, self.rect.height, 0, 2000, 10, 500, color=RED)
 
     def set_target(self, new_target):
         self.target = new_target
-
-    def apply_gravity(self, dt):
-        if not self.landed:
-            self.vel += pg.math.Vector2(0, self.scene.gravity) * dt
 
     def handle_jumping(self):
         pass
@@ -66,15 +52,6 @@ class Mob(RigidBody):
         else:
             self.move_dir = -1
             self.vel.x = max([self.vel.x - self.acc * dt, -self.speed])
-
-    def apply_friction(self):
-        if self.landed and self.move_dir == 0:
-            friction = self.collisions["down"][0].friction * math.copysign(1, -self.vel.x)
-            new_vel_x = self.vel.x + friction
-            if math.copysign(1, self.vel.x) == math.copysign(1, new_vel_x):
-                self.vel.x = new_vel_x
-            else:
-                self.vel.x = 0
 
     def handle_attack(self, t):
         if t - self.last_attack >= self.attack_cooldown: # left click

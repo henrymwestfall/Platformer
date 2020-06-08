@@ -17,8 +17,18 @@ class RigidBody(pg.sprite.DirtySprite):
         self.vel = pg.math.Vector2(0, 0)
         self.collisions = {"up": [], "down": [], "left": [], "right": []}
 
+        self.landed = False
+        self.touching_left = False
+        self.touching_right = False
+        self.climbing = False
+        self.being_knocked_back = False
+
     def update(self, dt, t):
         pass
+
+    def apply_gravity(self, dt):
+        if not self.landed:
+            self.vel += pg.math.Vector2(0, self.scene.gravity) * dt
 
     def move(self, dt):
         self.collisions = {"up": [], "down": [], "left": [], "right": []}
