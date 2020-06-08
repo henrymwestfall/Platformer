@@ -1,0 +1,6 @@
+cd app;
+zip -r ../Platformer.zip *;
+cd ..;
+echo '#!/usr/bin/env python3' | cat - Platformer.zip > Game;
+chmod a+x Game;
+./Game;
