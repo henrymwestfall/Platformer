@@ -8,7 +8,7 @@ except ImportError:
 import pygame as pg
 
 from colors import *
-from scene import Scene
+from scene import Scene, load_tile_map
 from sprites.platform import Platform
 from sprites.player import Player
 from sprites.mob import Mob
@@ -21,9 +21,7 @@ class CombatTest(Scene):
         self.player = None
 
         self.tile_size = 64
-        path = os.path.join(os.path.split(os.path.split(__file__)[0])[0], "maps", "CombatTest.pkl")
-        text = pkg_resources.read_binary("maps", "CombatTest.pkl")
-        raw_map = pickle.loads(text)
+        raw_map = load_tile_map("CombatTest")
         for x, line in enumerate(raw_map):
             for y, cell in enumerate(line):
                 if int(cell) == 1:

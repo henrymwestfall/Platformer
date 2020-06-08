@@ -1,9 +1,24 @@
 import random
+import os
+import pickle
+try:
+    import importlib.resources as pkg_resources
+except ImportError:
+    import importlib_resources as pkg_resources
 
 import pygame as pg
 
 from colors import *
 from camera import Camera
+
+def load_tile_map(name):
+    if ".pkl" in name:
+        file_name = name
+    else:
+        file_name = name + ".pkl"
+    text = pkg_resources.read_binary("maps", file_name)
+    raw_data = pickle.loads(text)
+    return raw_data
 
 class Scene:
     def __init__(self, name, game):
@@ -84,3 +99,9 @@ class Scene:
 
     def close(self):
         pass
+
+
+class Area(Scene):
+    def __init__(self, name, game):
+        super().__init__(name, game)
+
