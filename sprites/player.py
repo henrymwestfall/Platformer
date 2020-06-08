@@ -76,12 +76,6 @@ class Player(Character):
 
     def handle_attack(self, t):
         if self.scene.mouse_state[0] and self.mouse_has_lifted and t - self.last_attack >= self.attack_cooldown: # left click
-            y = self.rect.top
-            if self.scene.get_relative_mouse_pos().x >= self.rect.right:
-                x = self.rect.right
-            else:
-                x = self.rect.left - self.rect.width
-
             mp = self.scene.get_window_mouse_pos()
             tl_br, bl_tr = self.hitbox_calculation_lines
             mouse_pos_test_results = (
