@@ -27,7 +27,7 @@ class Game:
         self.clock = pg.time.Clock()
         self.time = 0
 
-        self.current_scene = CombatTest(self)
+        self.current_scene = SaltedReef(self)
         self.current_scene.start()
 
         self.main_loop()

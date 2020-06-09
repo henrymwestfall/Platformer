@@ -15,7 +15,7 @@ class Platform(StaticBody):
         rect = pg.Rect(4, 4, width - 4, height - 4)
         self.image.blit(internal_image, rect)
         self.rect = self.image.get_rect()
-        self.rect.center = (x, y)
+        self.rect.topleft = (x, y)
 
         self.friction = 75
 

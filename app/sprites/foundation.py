@@ -36,6 +36,7 @@ class RigidBody(pg.sprite.DirtySprite):
         self.pos.x += self.vel.x * dt
         self.rect.left = self.pos.x
         
+        # check collisions with static bodies while moving along the x-axis
         hit_list = pg.sprite.spritecollide(self, self.scene.static_bodies, False)
         for static_body in hit_list:
             if (self.vel.x < 0) and (self.rect.right > static_body.rect.right): # moving left
@@ -48,10 +49,21 @@ class RigidBody(pg.sprite.DirtySprite):
                 self.pos.x = self.rect.left
                 self.collisions["right"].append(static_body)
                 self.vel.x = 0
+
+        # check collisions with edges while moving along the x-axis
+        hit_list = pg.sprite.spritecollide(self, self.scene.edges, False)
+        for edge in hit_list:
+            if (self.vel.x > 0) and (self.rect.right < edge.rect.right): # moving right
+                self.rect.left = edge.rect.right
+                self.pos.x = self.rect.left
+            elif (self.vel.x < 0) and (self.rect.left > edge.rect.left): # moving left
+                self.rect.right = edge.rect.left
+                self.pos.x = self.rect.left
         
         self.pos.y += self.vel.y * dt
         self.rect.top = self.pos.y
 
+        # check for collisions with static bodies while moving in the y-axis
         hit_list = pg.sprite.spritecollide(self, self.scene.static_bodies, False)
         self.landed = False
         self.underneath = None
@@ -66,6 +78,18 @@ class RigidBody(pg.sprite.DirtySprite):
                 self.pos.y = self.rect.top
                 self.vel.y = 0
                 self.collisions["down"].append(static_body)
+
+        # check for collisions with edges while moving in the y-axis
+        hit_list = pg.sprite.spritecollide(self, self.scene.edges, False)
+        self.landed = False
+        self.underneath = None
+        for edge in hit_list:
+            if self.vel.y > 0: # moving down
+                self.rect.top = edge.rect.bottom
+                self.pos.y = self.rect.top
+            elif self.vel.y < 0: # moving up
+                self.rect.bottom = edge.rect.top
+                self.pos.y = self.rect.top
         
 
 class StaticBody(pg.sprite.DirtySprite):

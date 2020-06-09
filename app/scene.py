@@ -111,25 +111,24 @@ class Scene:
         pass
 
     def update(self, dt, t):
-        self.camera.update(dt, t)
+        synth_dt = dt
+        self.camera.update(synth_dt, t)
 
-        for sprite in self.rigid_bodies:
-            sprite.update(dt, t)
-        for particle in self.particles:
-            particle.update(dt, t)
-        for hud_e in self.hud:
-            hud_e.update(dt, t)
-        for trigger in self.triggers:
-            trigger.update(dt, t)
         for edge in self.edges:
-            edge.update(dt, t)
-
-        
-
-        if any([edge.colliding_player for edge in self.edges]):
+            edge.update(synth_dt, t)
+        if any([self.camera.shifted_rect(edge.rect).colliderect(self.screen_rect) for edge in self.edges]):
             self.drawing = False
         else:
             self.drawing = True
+
+        for sprite in self.rigid_bodies:
+            sprite.update(synth_dt, t)
+        for particle in self.particles:
+            particle.update(synth_dt, t)
+        for hud_e in self.hud:
+            hud_e.update(synth_dt, t)
+        for trigger in self.triggers:
+            trigger.update(synth_dt, t)
 
     def close(self):
         pass

@@ -20,7 +20,7 @@ class SaltedReef(Scene):
 
         self.player = None
 
-        raw_map = load_tile_map("room3")
+        raw_map = load_tile_map("room2")
         self.express_map(raw_map)
 
     def start(self):
