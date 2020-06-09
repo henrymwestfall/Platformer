@@ -40,12 +40,16 @@ class HitBox(RigidBody):
         for sprite in collisions:
             if isinstance(sprite, HitBox) or (sprite is self.parent):
                 continue
+
             
             # deal damage and apply knockback
             if hasattr(sprite, "health"):
-                sprite.health -= self.power
+                if type(sprite) != type(self.parent):
+                    sprite.health -= self.power
 
                 diff = pg.math.Vector2(sprite.rect.center) - pg.math.Vector2(self.parent.rect.center)
+                if diff.length() == 0:
+                    diff.x += 1
                 diff = diff.normalize()
                 knockback_vector = diff * (self.knockback) + self.parent.vel + pg.math.Vector2(0, -400)
 

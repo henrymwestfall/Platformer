@@ -16,7 +16,7 @@ class Player(Character):
         self.pos = pg.math.Vector2(self.rect.topleft)
 
         self.speed = 600
-        self.acc = 900
+        self.acc = 2400
 
         self.jump_strength = 1000
         self.jump_cut = 0.5

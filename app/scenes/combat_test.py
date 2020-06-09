@@ -27,8 +27,17 @@ class CombatTest(Scene):
         pg.display.set_caption("Combat Test")
 
         self.player = Player(self, self.screen.get_width() // 2, 300)
-        m = Mob(self, 2 * self.screen.get_width() // 3, 300)
-        m.set_target(self.player)
+
+        for i in range(2):
+            m = Mob(self, 2 * self.screen.get_width() // 3, 300 + i * 20)
+            m.set_target(self.player)
+
+            m = Mob(self, self.screen.get_width() // 3, 300 + i * 20)
+            m.set_target(self.player)
+
+            m = Mob(self, self.screen.get_width() * 1.5, 600 + i * 20)
+            m.set_target(self.player)
+        
         self.camera.set_focus(self.player)
 
         for edge in self.edges:
@@ -41,5 +50,12 @@ class CombatTest(Scene):
             if isinstance(body, Mob):
                 break
         else:
-            m = Mob(self, 2 * self.screen.get_width() // 3, 300)
-            m.set_target(self.player)
+            for i in range(2):
+                m = Mob(self, 2 * self.screen.get_width() // 3, 300 + i * 20)
+                m.set_target(self.player)
+
+                m = Mob(self, self.screen.get_width() // 3, 300 + i * 20)
+                m.set_target(self.player)
+
+                m = Mob(self, self.screen.get_width() * 1.5, 600 + i * 20)
+                m.set_target(self.player)
