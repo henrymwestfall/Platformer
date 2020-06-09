@@ -91,7 +91,9 @@ class Scene:
             self.draw_group(self.hud)
             self.draw_group(self.edges)
 
-            #pg.draw.rect(self.screen, RED, self.camera.shifted_rect(self.camera.drag_rect), 2)
+            for line in self.camera.debug_lines:
+                pg.draw.line(self.screen, *line)
+
         else:
             self.screen.fill(BLACK)
 

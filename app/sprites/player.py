@@ -35,8 +35,8 @@ class Player(Character):
         screen_w = self.scene.screen.get_width()
         screen_h = self.scene.screen.get_height()
         self.hitbox_calculation_lines = (
-            lambda x: (screen_h / screen_w) * x, # top left to bottom right
-            lambda x: -(screen_h / screen_w) * x + screen_h # bottom left to top right
+            lambda x, shift: (screen_h / screen_w) * (x - shift), # top left to bottom right
+            lambda x, shift: -(screen_h / screen_w) * (x - shift) + screen_h # bottom left to top right
         )
         self.hitbox_length = int(self.rect.height * 1.5) # long side of the hitbox
         self.hitbox_width = int(self.rect.width * 1.5) # short side of the hitbox
@@ -78,11 +78,14 @@ class Player(Character):
         if self.scene.mouse_state[0] and self.mouse_has_lifted and t - self.last_attack >= self.attack_cooldown: # left click
             mp = self.scene.get_window_mouse_pos()
             tl_br, bl_tr = self.hitbox_calculation_lines
+
+            shift = (pg.math.Vector2(self.scene.camera.shifted_rect(self.rect).center) - self.scene.screen_rect.center)
+
             mouse_pos_test_results = (
-                mp.y <= tl_br(mp.x) and mp.y <= bl_tr(mp.x),  # bottom quadrant
-                mp.y >= tl_br(mp.x) and mp.y <= bl_tr(mp.x), # right quadrant
-                mp.y <= tl_br(mp.x) and mp.y >= bl_tr(mp.x), # left quadrant
-                mp.y >= tl_br(mp.x) and mp.y >= bl_tr(mp.x) # top quadrant
+                mp.y <= tl_br(mp.x, shift.x) + shift.y and mp.y <= bl_tr(mp.x, shift.x) + shift.y,  # bottom quadrant
+                mp.y >= tl_br(mp.x, shift.x) + shift.y and mp.y <= bl_tr(mp.x, shift.x) + shift.y, # right quadrant
+                mp.y <= tl_br(mp.x, shift.x) + shift.y and mp.y >= bl_tr(mp.x, shift.x) + shift.y, # left quadrant
+                mp.y >= tl_br(mp.x, shift.x) + shift.y and mp.y >= bl_tr(mp.x, shift.x) + shift.y # top quadrant
             )
 
             for quadrant, result in enumerate(mouse_pos_test_results):

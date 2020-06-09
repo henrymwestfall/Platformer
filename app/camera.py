@@ -1,6 +1,9 @@
 import random
+import math
 
 import pygame as pg
+
+from colors import *
 
 class Camera:
     def __init__(self, scene, speed, acc, drag):
@@ -11,6 +14,7 @@ class Camera:
         self.screen_middle = pg.math.Vector2(self.screen_width / 2, self.screen_height / 2)
 
         self.focus = None
+        self.focus_offset = pg.math.Vector2(0, 0)
         self.speed = speed
         self.acc = acc
         self.drag = drag
@@ -23,8 +27,16 @@ class Camera:
 
         self.drag_rect = None
 
+        self.debug_lines = []
+        self.last_shift_amount = pg.math.Vector2(0, 0)
+        self.debugging = False
+
     def set_focus(self, new_focus):
+        self.focus_offset.x = -100
         self.focus = new_focus
+
+    def enable_debugging(self):
+        self.debugging = True
 
     def shifted_rect(self, absolute_rect):
         rect = pg.Rect(absolute_rect)
@@ -54,15 +66,59 @@ class Camera:
 
         needed_shift = self.shift
 
-        focus = self.focus.rect.center + self.focus.vel
-
         self.drag_rect = pg.Rect(0, 0, self.drag, self.drag)
+
+        self.focus_screen_rect = self.shifted_rect(self.focus.rect)
+
+        inner_line_x = 75
+        outer_line_x = 150
+
+        self.debug_lines = []
+
+        # detect collisions with inner and outer lines
+        if self.focus.vel.x > 0 and self.focus_screen_rect.right >= self.screen_middle.x + outer_line_x:
+            self.focus_offset.x = -inner_line_x - self.focus_screen_rect.width
+        elif self.focus.vel.x > 0 and self.focus_screen_rect.right >= self.screen_middle.x - inner_line_x and self.focus_screen_rect.right <= self.screen_middle.x:
+            self.focus_offset.x = -inner_line_x - self.focus_screen_rect.width
+
+        if self.focus.vel.x < 0 and self.focus_screen_rect.left <= self.screen_middle.x - outer_line_x:
+            self.focus_offset.x = inner_line_x + self.focus_screen_rect.width * 0.5
+        elif self.focus.vel.x < 0 and self.focus_screen_rect.left <= self.screen_middle.x + inner_line_x and self.focus_screen_rect.left >= self.screen_middle.x:
+            self.focus_offset.x = inner_line_x + self.focus_screen_rect.width * 0.5
+
+        self.focus_offset.y = 0
+
+        # add debug lines
+        if self.debugging:
+            color_map = [RED, RED, FOREST_GREEN, FOREST_GREEN, WHITE]
+            for i, debug_line_offset in enumerate([-outer_line_x, outer_line_x, -inner_line_x, inner_line_x, self.focus_offset.x]):
+                start = (self.screen_middle.x + debug_line_offset, 0)
+                end = (self.screen_middle.x + debug_line_offset, self.screen_height)
+                self.debug_lines.append((color_map[i], start, end))
+            
+        # calculate difference from the center of the screen
+        difference = self.focus_screen_rect.center - (self.screen_middle + self.focus_offset)
         
-        difference = pg.math.Vector2(focus) - self.shift - self.screen_middle
-        
-        if not self.drag_rect.colliderect(self.focus.rect):
-            needed_shift += difference / 32
-            self.drag_rect.center = focus
+        # disable shifting if focus point and focus entity are in the same inner-outer region
+        need_shift = True
+        if (self.focus_screen_rect.centerx < self.screen_middle.x + outer_line_x and self.focus_screen_rect.centerx > self.screen_middle.x + inner_line_x
+                and self.focus_offset.x < self.screen_middle.x + outer_line_x and self.focus_offset.x > self.screen_middle.x + inner_line_x):
+            need_shift = False
+        elif (self.focus_screen_rect.centerx < self.screen_middle.x - inner_line_x and self.focus_screen_rect.centerx > self.screen_middle.x - outer_line_x
+                and self.focus_offset.x < self.screen_middle.x + outer_line_x and self.focus_offset.x > self.screen_middle.x + inner_line_x):
+            need_shift = False
+        if math.copysign(1, self.last_shift_amount.x) != math.copysign(1, self.focus.vel.x):
+            need_shift = True
+
+        # add to needed_shift if necessary
+        if need_shift:
+            vel = difference / 32
+            if vel.x > self.focus.vel.x * 2:
+                self.last_shift_amount = vel
+                needed_shift += self.last_shift_amount
+            else:
+                self.last_shift_amount = vel * 3
+                needed_shift += self.last_shift_amount
 
 
         fat_focus = pg.Rect(self.focus.rect)

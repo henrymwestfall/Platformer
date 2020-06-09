@@ -31,6 +31,9 @@ class CombatTest(Scene):
         m.set_target(self.player)
         self.camera.set_focus(self.player)
 
+        for edge in self.edges:
+            edge.player = self.player
+
     def update(self, dt, t):
         super().update(dt, t)
 
