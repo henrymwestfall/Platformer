@@ -38,8 +38,8 @@ class Player(Character):
             lambda x, shift: (screen_h / screen_w) * (x - shift), # top left to bottom right
             lambda x, shift: -(screen_h / screen_w) * (x - shift) + screen_h # bottom left to top right
         )
-        self.hitbox_length = int(self.rect.height * 1.5) # long side of the hitbox
-        self.hitbox_width = int(self.rect.width * 1.5) # short side of the hitbox
+        self.hitbox_length = int(self.rect.height * 2.5) # long side of the hitbox
+        self.hitbox_width = int(self.rect.width * 2.5) # short side of the hitbox
 
     def handle_jumping(self):
         if self.landed and self.scene.keys_pressed[pg.K_w]:
