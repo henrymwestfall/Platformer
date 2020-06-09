@@ -5,6 +5,7 @@ import pygame as pg
 from scenes.test_scene import Demo
 from scenes.western_forest import WesternForest
 from scenes.combat_test import CombatTest
+from scenes.salted_reef import SaltedReef
 
 class Game:
     def __init__(self):

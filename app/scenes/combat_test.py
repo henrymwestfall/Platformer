@@ -20,7 +20,6 @@ class CombatTest(Scene):
 
         self.player = None
 
-        self.tile_size = 64
         raw_map = load_tile_map("CombatTest")
         self.express_map(raw_map)
 

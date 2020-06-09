@@ -14,10 +14,13 @@ TILE_COLOR = (34, 139, 34)
 TILE = pg.Surface([TILE_SIZE, TILE_SIZE])
 TILE.fill(TILE_COLOR)
 
+EDGE = pg.Surface([TILE_SIZE, TILE_SIZE])
+EDGE.fill((0, 0, 0))
+
 COIN = pg.Surface([16, 16])
 pg.draw.circle(COIN, (255, 255, 0), (8, 8), 8)
 
-MAP_NAME = "Combat Test"
+MAP_NAME = "room3"
 
 pg.init()
 screen = pg.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
@@ -27,10 +30,10 @@ map_surface = pg.Surface([TILE_SIZE * MAP_WIDTH, TILE_SIZE * MAP_HEIGHT])
 map_surface.fill((128, 198, 229))
 map_rect = map_surface.get_rect()
 
-if not os.path.exists(f"{MAP_NAME}.pkl"):
+if not os.path.exists(f"{MAP_NAME}.map"):
     current_map = [[0 for y in range(MAP_HEIGHT)] for x in range(MAP_WIDTH)]
 else:
-    with open(f"{MAP_NAME}.pkl", "rb") as f:
+    with open(f"{MAP_NAME}.map", "rb") as f:
         current_map = pickle.load(f)
 
 def finish():
@@ -39,7 +42,7 @@ def finish():
     while not (do_save in ["y", "n"]):
         do_save = input("Save map? [y/n] ")
         if do_save == "y":
-            with open(f"{MAP_NAME}.pkl", "wb") as f:
+            with open(f"{MAP_NAME}.map", "wb") as f:
                 pickle.dump(current_map, f)
         elif do_save == "n":
             pass
@@ -106,6 +109,16 @@ while True:
             current_map[int(focus.x)][int(focus.y)] = 2
         except IndexError:
             pass
+    
+    if pressed[pg.K_e]:
+        focus = pg.math.Vector2(mouse_pos)
+        focus.x = (focus.x - camera_x) // TILE_SIZE
+        focus.y = (focus.y - camera_y) // TILE_SIZE
+
+        try:
+            current_map[int(focus.x)][int(focus.y)] = 3
+        except IndexError:
+            pass
 
     if pressed[pg.K_f]: # fill recursively
         if not cleared:
@@ -157,5 +170,7 @@ while True:
                 screen.blit(TILE, rect)
             elif cell == 2:
                 screen.blit(COIN, rect)
+            elif cell >= 3:
+                screen.blit(EDGE, rect)
     
     pg.display.flip()

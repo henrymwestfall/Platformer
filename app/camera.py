@@ -13,6 +13,7 @@ class Camera:
         self.acc = acc
         self.drag = drag
         self.shift = pg.math.Vector2(0, 0)
+        self.vel = pg.math.Vector2(0, 0)
 
         self.shake_start = 0
         self.shake_duration = 0
@@ -41,24 +42,56 @@ class Camera:
             shift = pg.math.Vector2(choices) * random.choice([-1, 1])
             progress = (t - self.shake_start) / self.shake_duration
             shift = shift.lerp(pg.math.Vector2(0, 0), progress)
-            self.camera_shift += shift
+            self.shift += shift
 
     def update(self, dt, t):
         if self.focus == None:
             return
 
         needs_update = False
-        if self.focus.rect.centerx < self.screen_middle.x - self.drag:
+        side = []
+        if self.focus.rect.centerx <= self.screen_middle.x - self.drag:
             needs_update = True
-        elif self.focus.rect.centerx > self.screen_middle.x + self.drag:
+            side.append("left")
+        elif self.focus.rect.centerx >= self.screen_middle.x + self.drag:
             needs_update = True
+            side.append("right")
 
-        if self.focus.rect.centery < self.screen_middle.y - self.drag:
+        if self.focus.rect.centery <= self.screen_middle.y - self.drag:
             needs_update = True
-        elif self.focus.rect.centery > self.screen_middle.y + self.drag:
+            side.append("bottom")
+        elif self.focus.rect.centery >= self.screen_middle.y + self.drag:
             needs_update = True
+            side.append("top")
         
+        needed_shift = pg.math.Vector2(0, 0)
         if needs_update:
-            self.shift = self.shift.lerp(pg.math.Vector2(self.focus.rect.center) - self.screen_middle, self.acc)
-        
+            difference = pg.math.Vector2(self.focus.rect.center) - self.screen_middle
+            needed_shift = self.shift.lerp(difference, self.acc)
+            if self.focus.vel.length() > needed_shift.length():
+                pass
+            
+
+        fat_focus = pg.Rect(self.focus.rect)
+        fat_focus.width = self.scene.screen_rect.width
+        fat_focus.center = self.focus.rect.center
+
+        rect = pg.Rect(self.scene.screen_rect)
+        rect.left = self.shift.x
+        rect.top = self.shift.y
+
+        rect.left = needed_shift.x
+        for edge in self.scene.edges:
+            if rect.colliderect(edge.rect):
+                to_the_right = edge.rect.left >= self.focus.rect.right
+                to_the_left = edge.rect.right <= self.focus.rect.left
+                in_y_range = fat_focus.colliderect(edge.rect)
+                if to_the_right and in_y_range:
+                    rect.right = edge.rect.left
+                elif to_the_left and in_y_range:
+                    rect.left = edge.rect.right
+        needed_shift.x = rect.x
+
+        self.shift = needed_shift
+
         self.handle_screenshake(t)
