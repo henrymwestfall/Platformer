@@ -56,7 +56,7 @@ class Scene:
         self.mouse_state = (False, False, False)
 
         # camera
-        self.camera = Camera(self, 1000, 0.05, 50)
+        self.camera = Camera(self, 1000, 0.05, 200)
 
 
     def express_map(self, tile_map, tile_size=64):
@@ -90,6 +90,8 @@ class Scene:
             self.draw_group(self.particles)
             self.draw_group(self.hud)
             self.draw_group(self.edges)
+
+            pg.draw.rect(self.screen, RED, self.camera.drag_rect, 2)
         else:
             self.screen.fill(BLACK)
 
@@ -107,6 +109,8 @@ class Scene:
         pass
 
     def update(self, dt, t):
+        self.camera.update(dt, t)
+
         for sprite in self.rigid_bodies:
             sprite.update(dt, t)
         for particle in self.particles:
@@ -118,7 +122,7 @@ class Scene:
         for edge in self.edges:
             edge.update(dt, t)
 
-        self.camera.update(dt, t)
+        
 
         if any([edge.colliding_player for edge in self.edges]):
             self.drawing = False

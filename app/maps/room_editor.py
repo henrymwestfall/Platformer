@@ -69,12 +69,7 @@ camera_x = 0
 camera_y = 0
 camera_speed = 1000
 
-corners = [
-    pg.math.Vector2(0, 0),
-    pg.math.Vector2(TILE_SIZE * MAP_WIDTH, 0),
-    pg.math.Vector2(TILE_SIZE * MAP_WIDTH, TILE_SIZE * MAP_HEIGHT),
-    pg.math.Vector2(0, TILE_SIZE * MAP_HEIGHT)
-]
+section_path_start = None
 
 while True:
     dt = clock.tick(60) / 1000.0

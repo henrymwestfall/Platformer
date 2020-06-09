@@ -6,7 +6,9 @@ class Camera:
     def __init__(self, scene, speed, acc, drag):
         self.scene = scene
         self.screen = self.scene.screen
-        self.screen_middle = pg.math.Vector2(self.screen.get_width() / 2, self.screen.get_height() / 2)
+        self.screen_height = self.screen.get_height()
+        self.screen_width = self.screen.get_width()
+        self.screen_middle = pg.math.Vector2(self.screen_width / 2, self.screen_height / 2)
 
         self.focus = None
         self.speed = speed
@@ -18,6 +20,8 @@ class Camera:
         self.shake_start = 0
         self.shake_duration = 0
         self.shake_magnitude = 0
+
+        self.drag_rect = None
 
     def set_focus(self, new_focus):
         self.focus = new_focus
@@ -48,29 +52,17 @@ class Camera:
         if self.focus == None:
             return
 
-        needs_update = False
-        side = []
-        if self.focus.rect.centerx <= self.screen_middle.x - self.drag:
-            needs_update = True
-            side.append("left")
-        elif self.focus.rect.centerx >= self.screen_middle.x + self.drag:
-            needs_update = True
-            side.append("right")
-
-        if self.focus.rect.centery <= self.screen_middle.y - self.drag:
-            needs_update = True
-            side.append("bottom")
-        elif self.focus.rect.centery >= self.screen_middle.y + self.drag:
-            needs_update = True
-            side.append("top")
+        needed_shift = self.shift
+        focus_screen_rect = self.shifted_rect(self.focus.rect)
+        self.drag_rect = pg.Rect(0, 0, self.drag * 2, self.drag * 2)
+        self.drag_rect.center = (self.screen_width // 2, self.screen_height // 2)
+        self.drag_rect.center -= (self.focus.vel * dt) * 3
         
-        needed_shift = pg.math.Vector2(0, 0)
-        if needs_update:
-            difference = pg.math.Vector2(self.focus.rect.center) - self.screen_middle
-            needed_shift = self.shift.lerp(difference, self.acc)
-            if self.focus.vel.length() > needed_shift.length():
-                pass
-            
+        difference = pg.math.Vector2(self.focus.rect.center) - self.drag_rect.center
+
+        if not self.drag_rect.colliderect(focus_screen_rect):
+            needed_shift = needed_shift.lerp(difference, 0.05)
+
 
         fat_focus = pg.Rect(self.focus.rect)
         fat_focus.width = self.scene.screen_rect.width

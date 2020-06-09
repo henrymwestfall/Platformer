@@ -7,8 +7,8 @@ def main():
 
 if __name__ == "__main__":
     tasks = [
-    lambda: os.system("pip install pygame"),
-    lambda: os.system("pip3 install pygame"),
+        lambda: os.system("pip install pygame"),
+        lambda: os.system("pip3 install pygame"),
     ]
     for t in tasks:
         try:
