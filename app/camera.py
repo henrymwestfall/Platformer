@@ -53,19 +53,20 @@ class Camera:
             return
 
         needed_shift = self.shift
-        focus_screen_rect = self.shifted_rect(self.focus.rect)
-        self.drag_rect = pg.Rect(0, 0, self.drag * 2, self.drag * 2)
-        self.drag_rect.center = (self.screen_width // 2, self.screen_height // 2)
-        self.drag_rect.center -= (self.focus.vel * dt) * 3
-        
-        difference = pg.math.Vector2(self.focus.rect.center) - self.drag_rect.center
 
-        if not self.drag_rect.colliderect(focus_screen_rect):
-            needed_shift = needed_shift.lerp(difference, 0.05)
+        focus = self.focus.rect.center + self.focus.vel
+
+        self.drag_rect = pg.Rect(0, 0, self.drag, self.drag)
+        
+        difference = pg.math.Vector2(focus) - self.shift - self.screen_middle
+        
+        if not self.drag_rect.colliderect(self.focus.rect):
+            needed_shift += difference / 32
+            self.drag_rect.center = focus
 
 
         fat_focus = pg.Rect(self.focus.rect)
-        fat_focus.width = self.scene.screen_rect.width
+        fat_focus.width = self.scene.screen_rect.width * 2
         fat_focus.center = self.focus.rect.center
 
         rect = pg.Rect(self.scene.screen_rect)
@@ -83,6 +84,22 @@ class Camera:
                 elif to_the_left and in_y_range:
                     rect.left = edge.rect.right
         needed_shift.x = rect.x
+
+        tall_focus = pg.Rect(self.focus.rect)
+        tall_focus.height = self.screen_height * 2
+        tall_focus.center = self.focus.rect.center
+
+        rect.top = needed_shift.y
+        for edge in self.scene.edges:
+            if rect.colliderect(edge.rect):
+                below = edge.rect.top >= self.focus.rect.bottom
+                above = edge.rect.bottom <= self.focus.rect.top
+                in_x_range = tall_focus.colliderect(edge.rect)
+                if below and in_x_range:
+                    rect.bottom = edge.rect.top
+                elif above and in_x_range:
+                    rect.top = edge.rect.bottom
+        needed_shift.y = rect.y
 
         self.shift = needed_shift
 
