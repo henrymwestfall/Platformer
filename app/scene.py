@@ -12,6 +12,7 @@ from colors import *
 from camera import Camera
 from sprites.platform import Platform
 from sprites.edge import Edge
+from sprites.mob import Mob
 
 def load_tile_map(name, *subdirs):
     if ".pkl" in name:
@@ -66,6 +67,8 @@ class Scene:
                     Platform(self, x * tile_size, y * tile_size, tile_size, tile_size)
                 elif int(cell) == 3:
                     Edge(self, x * tile_size, y * tile_size, tile_size, tile_size)
+                elif int(cell) == 4:
+                    Mob(self, x * tile_size, y * tile_size)
 
     def get_relative_mouse_pos(self):
         return self.__mouse_pos + self.camera.shift

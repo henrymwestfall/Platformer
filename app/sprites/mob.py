@@ -53,6 +53,13 @@ class Mob(Character):
             self.move_dir = -1
             self.vel.x = max([self.vel.x - self.acc * dt, -self.speed])
 
+        pt = self.rect.bottom + self.vel.x + 5
+        for body in self.scene.static_bodies:
+            if body.rect.collidepoint((pt, self.rect.centerx)):
+                break
+        else:
+            pass
+
     def handle_attack(self, t):
         if t - self.last_attack >= self.attack_cooldown: # left click
             y = self.rect.top
@@ -86,6 +93,7 @@ class Mob(Character):
         #self.handle_attack(t)
         
         # update position
+
         self.move(dt)
         rect_pos = pg.math.Vector2(self.pos)
         if rect_pos.x < 0:

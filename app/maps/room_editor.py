@@ -20,7 +20,10 @@ EDGE.fill((0, 0, 0))
 COIN = pg.Surface([16, 16])
 pg.draw.circle(COIN, (255, 255, 0), (8, 8), 8)
 
-MAP_NAME = "room2"
+MOB = pg.Surface([TILE_SIZE, TILE_SIZE])
+MOB.fill((255, 0, 0))
+
+MAP_NAME = "SaltedReef"
 
 pg.init()
 screen = pg.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])
@@ -105,6 +108,17 @@ while True:
         except IndexError:
             pass
     
+
+    if pressed[pg.K_m]:
+        focus = pg.math.Vector2(mouse_pos)
+        focus.x = (focus.x - camera_x) // TILE_SIZE
+        focus.y = (focus.y - camera_y) // TILE_SIZE
+
+        try:
+            current_map[int(focus.x)][int(focus.y)] = 4
+        except IndexError:
+            pass
+
     if pressed[pg.K_e]:
         focus = pg.math.Vector2(mouse_pos)
         focus.x = (focus.x - camera_x) // TILE_SIZE
@@ -165,7 +179,9 @@ while True:
                 screen.blit(TILE, rect)
             elif cell == 2:
                 screen.blit(COIN, rect)
-            elif cell >= 3:
+            elif cell == 3:
                 screen.blit(EDGE, rect)
-    
+            elif cell == 4:
+                screen.blit(MOB, rect)
+
     pg.display.flip()

@@ -20,17 +20,20 @@ class SaltedReef(Scene):
 
         self.player = None
 
-        raw_map = load_tile_map("room2")
+        raw_map = load_tile_map("SaltedReef")
         self.express_map(raw_map)
 
     def start(self):
         pg.display.set_caption("Combat Test")
 
-        self.player = Player(self, self.screen.get_width() // 2, 300)
+        self.player = Player(self, self.screen.get_width() // 2, 600)
         self.camera.set_focus(self.player)
 
         for edge in self.edges:
             edge.player = self.player
+        for sprite in self.rigid_bodies:
+            if isinstance(sprite, Mob):
+                sprite.set_target(self.player)
 
     def update(self, dt, t):
         super().update(dt, t)
