@@ -6,11 +6,11 @@ from scenes.test_scene import Demo
 from scenes.western_forest import WesternForest
 from scenes.combat_test import CombatTest
 from scenes.salted_reef import SaltedReef
+from scenes.game_over import GameOver
 
 class Game:
     def __init__(self):
         # scene info
-        self.scenes = []
         self.scenes_by_name = {}
         self.current_scene = None
 
@@ -21,6 +21,16 @@ class Game:
         self.screen = None
         self.screen_resolution = (900, 600)
 
+    def set_screen(self, origin, scene):
+        if scene in self.scenes_by_name:
+            self.current_scene = self.scenes_by_name[scene]
+            self.current_scene.start(origin)
+        elif scene in self.scenes_by_name.values():
+            self.current_scene = scene
+            scene.start(origin)
+        else:
+            origin.start(origin)
+
     def start(self):
         print("starting game")
         pg.init()
@@ -29,7 +39,9 @@ class Game:
         self.time = 0
 
         self.current_scene = SaltedReef(self)
-        self.current_scene.start()
+        self.current_scene.start(None)
+
+        GameOver(self)
 
         self.main_loop()
 
@@ -43,6 +55,9 @@ class Game:
                 continue
 
             self.current_scene.handle_events()
+
+            if not pg.mouse.get_focused():
+                continue
 
             if self.current_scene.keys_pressed[pg.K_q]:
                 done = True

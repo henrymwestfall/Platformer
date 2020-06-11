@@ -30,7 +30,8 @@ class Player(Character):
 
         self.move_dir = 0
 
-        self.health = 100
+        self.max_health = 100
+        self.health = self.max_health
 
         screen_w = self.scene.screen.get_width()
         screen_h = self.scene.screen.get_height()
@@ -109,6 +110,8 @@ class Player(Character):
         self.mouse_has_lifted = not self.scene.mouse_state[0]
 
     def update(self, dt, t):
+        super().update(dt, t)
+
         # update collision variables
         self.landed = len(self.collisions["down"]) > 0
         self.touching_left = len(self.collisions["left"]) > 0

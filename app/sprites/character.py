@@ -42,6 +42,13 @@ class Character(RigidBody):
         self.attack_cooldown = attack_cooldown
         self.last_attack = 0
 
+        self.invinsible_time = 0
+
+    def update(self, dt, t):
+        self.invinsible_time -= dt
+        if self.invinsible_time < 0:
+            self.invinsible_time = 0
+
     def apply_friction(self):
         if self.landed and self.move_dir == 0:
             friction = self.collisions["down"][0].friction * math.copysign(1, -self.vel.x)

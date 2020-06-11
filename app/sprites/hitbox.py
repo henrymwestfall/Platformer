@@ -44,16 +44,18 @@ class HitBox(RigidBody):
             
             # deal damage and apply knockback
             if hasattr(sprite, "health"):
-                if type(sprite) != type(self.parent):
-                    sprite.health -= self.power
+                if sprite.invinsible_time == 0:
+                    if type(sprite) != type(self.parent):
+                        sprite.health -= self.power
 
-                diff = pg.math.Vector2(sprite.rect.center) - pg.math.Vector2(self.parent.rect.center)
-                if diff.length() == 0:
-                    diff.x += 1
-                diff = diff.normalize()
-                knockback_vector = diff * (self.knockback) + self.parent.vel + pg.math.Vector2(0, -400)
+                    diff = pg.math.Vector2(sprite.rect.center) - pg.math.Vector2(self.parent.rect.center)
+                    if diff.length() == 0:
+                        diff.x += 1
+                    diff = diff.normalize()
+                    knockback_vector = diff * (self.knockback) + self.parent.vel + pg.math.Vector2(0, -400)
 
-                sprite.vel = knockback_vector
+                    sprite.vel = knockback_vector
+                    sprite.invinsible_time = 0.5
 
         # determine if we should die
         if t - self.birth >= self.lifetime:

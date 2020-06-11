@@ -62,7 +62,6 @@ class Scene:
 
 
     def express_map(self, tile_map, tile_size=64):
-        columns = {}
         for x, line in enumerate(tile_map):
             platform_y_start = None
             last_was_platform = False

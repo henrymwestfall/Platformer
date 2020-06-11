@@ -13,6 +13,7 @@ from sprites.platform import Platform
 from sprites.player import Player
 from sprites.mob import Mob
 from sprites.score_tracker import ScoreTracker
+from sprites.health_bar import HealthBar
 
 
 class SaltedReef(Scene):
@@ -26,9 +27,11 @@ class SaltedReef(Scene):
 
         self.background = BLACK
 
-        ScoreTracker(self, 0, 0)
+        HealthBar(self, 0, 0)
+        ScoreTracker(self, 0, 30)
 
-    def start(self):
+    def start(self, origin):
+        self.__init__(self.game)
         pg.display.set_caption("Combat Test")
 
         self.player = Player(self, self.screen.get_width() // 2, 600)
@@ -42,3 +45,6 @@ class SaltedReef(Scene):
 
     def update(self, dt, t):
         super().update(dt, t)
+
+        if self.player.health <= 0:
+            self.game.set_screen(self, "Game Over")

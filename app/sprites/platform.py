@@ -1,3 +1,5 @@
+import random
+
 import pygame as pg
 
 from colors import *
@@ -14,7 +16,7 @@ class Platform(StaticBody):
             print(width, height)
             raise e
         self.image.fill(BLUE)
-        #pg.draw.line(self.image, WHITE, (0, 0), (width, height))
+        pg.draw.line(self.image, WHITE, (0, 0), (width, 0), width=5)
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
 

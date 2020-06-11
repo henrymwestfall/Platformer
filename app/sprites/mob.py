@@ -24,13 +24,13 @@ class Mob(Character):
         self.attack_cooldown = 0.4
         self.last_attack = 0
         
-        self.health = 200
+        self.health = 50
 
         self.move_dir = 0
 
         self.target = None
 
-        self.hitbox = HitBox(self, self.rect.x, self.rect.y, self.rect.width, self.rect.height, 0, 2000, 10, 500, color=RED)
+        self.hitbox = HitBox(self, self.rect.x, self.rect.y, self.rect.width, self.rect.height, 0, 2000, 5, 500, color=RED)
 
     def set_target(self, new_target):
         self.target = new_target
@@ -72,6 +72,8 @@ class Mob(Character):
             self.last_attack = t
 
     def update(self, dt, t):
+        super().update(dt, t)
+
         # update collision variables
         self.landed = len(self.collisions["down"]) > 0
         self.touching_left = len(self.collisions["left"]) > 0
