@@ -8,12 +8,13 @@ class Platform(StaticBody):
     def __init__(self, scene, x, y, width, height):
         StaticBody.__init__(self, scene)
 
-        self.image = pg.Surface([width, height])
-        self.image.fill(FOREST_GREEN)
-        internal_image = pg.Surface([width - 8, height - 8])
-        internal_image.fill(FOREST_GREEN)
-        rect = pg.Rect(4, 4, width - 4, height - 4)
-        self.image.blit(internal_image, rect)
+        try:
+            self.image = pg.Surface([width, height])
+        except Exception as e:
+            print(width, height)
+            raise e
+        self.image.fill(BLUE)
+        #pg.draw.line(self.image, WHITE, (0, 0), (width, height))
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
 

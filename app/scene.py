@@ -13,6 +13,7 @@ from camera import Camera
 from sprites.platform import Platform
 from sprites.edge import Edge
 from sprites.mob import Mob
+from sprites.collectables import Coin
 
 def load_tile_map(name, *subdirs):
     if ".pkl" in name:
@@ -61,14 +62,28 @@ class Scene:
 
 
     def express_map(self, tile_map, tile_size=64):
+        columns = {}
         for x, line in enumerate(tile_map):
+            platform_y_start = None
+            last_was_platform = False
             for y, cell in enumerate(line):
-                if int(cell) == 1:
-                    Platform(self, x * tile_size, y * tile_size, tile_size, tile_size)
+                if int(cell) == 1 and not last_was_platform:
+                    last_was_platform = True
+                    platform_y_start = y
+                elif int(cell) == 2:
+                    Coin(self, x * tile_size, y * tile_size)
                 elif int(cell) == 3:
                     Edge(self, x * tile_size, y * tile_size, tile_size, tile_size)
                 elif int(cell) == 4:
                     Mob(self, x * tile_size, y * tile_size)
+
+                if last_was_platform and (int(cell) != 1):
+                    x_pxl = x * tile_size
+                    y_pxl = platform_y_start * tile_size
+                    height = (y - platform_y_start) * tile_size
+                    width = tile_size
+                    Platform(self, x_pxl, y_pxl, width, height)
+                    last_was_platform = False
 
     def get_relative_mouse_pos(self):
         return self.__mouse_pos + self.camera.shift

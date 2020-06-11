@@ -2,10 +2,12 @@ import sys
 import os
 
 def main():
+    print("initializing game")
     g = Game()
     g.start()
 
 if __name__ == "__main__":
+    print("starting...")
     tasks = [
         lambda: os.system("pip install pygame"),
         lambda: os.system("pip3 install pygame"),
@@ -24,5 +26,4 @@ if __name__ == "__main__":
     print("pygame successfully imported!")
 
     from game import Game
-    os.system("exit")
     main()

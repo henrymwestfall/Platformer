@@ -12,6 +12,7 @@ from scene import Scene, load_tile_map
 from sprites.platform import Platform
 from sprites.player import Player
 from sprites.mob import Mob
+from sprites.score_tracker import ScoreTracker
 
 
 class SaltedReef(Scene):
@@ -22,6 +23,10 @@ class SaltedReef(Scene):
 
         raw_map = load_tile_map("SaltedReef")
         self.express_map(raw_map)
+
+        self.background = BLACK
+
+        ScoreTracker(self, 0, 0)
 
     def start(self):
         pg.display.set_caption("Combat Test")

@@ -22,18 +22,20 @@ class Game:
         self.screen_resolution = (900, 600)
 
     def start(self):
+        print("starting game")
         pg.init()
         self.screen = pg.display.set_mode(self.screen_resolution)
         self.clock = pg.time.Clock()
         self.time = 0
 
-        self.current_scene = CombatTest(self)
+        self.current_scene = SaltedReef(self)
         self.current_scene.start()
 
         self.main_loop()
 
     def main_loop(self):
         done = False
+        print("starting mainloop")
         while not done:
             dt = self.clock.tick(60) / 1000.0
             self.time += dt
