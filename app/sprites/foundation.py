@@ -22,9 +22,13 @@ class RigidBody(pg.sprite.DirtySprite):
         self.touching_right = False
         self.climbing = False
         self.being_knocked_back = False
+        self.knockback_time = 0
 
     def update(self, dt, t):
-        pass
+        # update collision variables
+        self.landed = len(self.collisions["down"]) > 0
+        self.touching_left = len(self.collisions["left"]) > 0
+        self.touching_right = len(self.collisions["right"]) > 0
 
     def apply_gravity(self, dt):
         if not self.landed:
@@ -37,7 +41,10 @@ class RigidBody(pg.sprite.DirtySprite):
         self.rect.left = self.pos.x
         
         # check collisions with static bodies while moving along the x-axis
-        hit_list = pg.sprite.spritecollide(self, self.scene.static_bodies, False)
+        try:
+            hit_list = pg.sprite.spritecollide(self, self.scene.platform_columns[self.rect.left // 64], False)
+        except IndexError as e:
+            hit_list = pg.sprite.spritecollide(self, self.scene.static_bodies, False)
         for static_body in hit_list:
             if (self.vel.x < 0) and (self.rect.right > static_body.rect.right): # moving left
                 self.rect.left = static_body.rect.right
@@ -64,7 +71,10 @@ class RigidBody(pg.sprite.DirtySprite):
         self.rect.top = self.pos.y
 
         # check for collisions with static bodies while moving in the y-axis
-        hit_list = pg.sprite.spritecollide(self, self.scene.static_bodies, False)
+        try:
+            hit_list = pg.sprite.spritecollide(self, self.scene.platform_columns[self.rect.left // 64], False)
+        except IndexError as e:
+            hit_list = pg.sprite.spritecollide(self, self.scene.static_bodies, False)
         self.landed = False
         self.underneath = None
         for static_body in hit_list:

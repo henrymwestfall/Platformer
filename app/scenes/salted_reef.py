@@ -46,5 +46,7 @@ class SaltedReef(Scene):
     def update(self, dt, t):
         super().update(dt, t)
 
+        pg.display.set_caption(str(round(1 / dt, 2)))
+
         if self.player.health <= 0:
             self.game.set_screen(self, "Game Over")

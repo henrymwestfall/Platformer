@@ -16,7 +16,7 @@ class Mob(Character):
         self.pos = pg.math.Vector2(self.rect.topleft)
 
         self.speed = 250
-        self.acc = 500
+        self.acc = 1000
 
         self.jump_strength = 1000
         self.jump_cut = 0.5
@@ -30,7 +30,7 @@ class Mob(Character):
 
         self.target = None
 
-        self.hitbox = HitBox(self, self.rect.x, self.rect.y, self.rect.width, self.rect.height, 0, 2000, 5, 500, color=RED)
+        self.hitbox = HitBox(self, self.rect.x, self.rect.y, self.rect.width, self.rect.height, 0, 2000, 5, 500)
 
     def set_target(self, new_target):
         self.target = new_target
@@ -40,25 +40,45 @@ class Mob(Character):
 
     def handle_horz_movement(self, dt):
         self.move_dir = 0
-        
-        self.being_knocked_back = (not self.landed) and self.being_knocked_back
 
-        if self.being_knocked_back:
+        if self.knockback_time != 0:
             return
 
         if self.target.rect.centerx >= self.rect.centerx: # move right
             self.move_dir = 1
-            self.vel.x = min([self.vel.x + self.acc * dt, self.speed])
         else:
             self.move_dir = -1
-            self.vel.x = max([self.vel.x - self.acc * dt, -self.speed])
 
-        pt = self.rect.bottom + self.vel.x + 5
-        for body in self.scene.static_bodies:
-            if body.rect.collidepoint((pt, self.rect.centerx)):
+        platform_to_left = False
+        platform_to_right = False
+
+        left_look = (self.rect.left - self.rect.width, self.rect.bottom)
+        right_look = (self.rect.right + self.rect.width, self.rect.bottom)
+
+        for static_body in self.scene.platform_columns[self.rect.left // 64]:
+            if static_body.rect.collidepoint(left_look):
+                platform_to_left = True
+            elif static_body.rect.collidepoint(right_look):
+                platform_to_right = True
+            if platform_to_left and platform_to_right:
                 break
-        else:
-            pass
+
+        if (not platform_to_left) and (not platform_to_right):
+            self.move_dir = 0  
+        elif not platform_to_left:
+            self.move_dir = 1
+        elif not platform_to_right:
+            self.move_dir = -1
+
+        if self.move_dir == 1:
+            self.vel.x = min([self.vel.x + self.acc * dt, self.speed])
+        elif self.move_dir == -1:
+            self.vel.x = max([self.vel.x - self.acc * dt, -self.speed])
+        elif self.vel.x > 0:
+            self.vel.x = min([self.vel.x + self.acc * dt, self.speed])
+        elif self.vel.x < 0:
+            self.vel.x = max([self.vel.x - self.acc * dt, self.speed])
+
 
     def handle_attack(self, t):
         if t - self.last_attack >= self.attack_cooldown: # left click
@@ -73,11 +93,6 @@ class Mob(Character):
 
     def update(self, dt, t):
         super().update(dt, t)
-
-        # update collision variables
-        self.landed = len(self.collisions["down"]) > 0
-        self.touching_left = len(self.collisions["left"]) > 0
-        self.touching_right = len(self.collisions["right"]) > 0
 
         # apply gravity
         self.apply_gravity(dt)

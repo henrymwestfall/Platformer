@@ -77,14 +77,14 @@ class Camera:
 
         # detect collisions with inner and outer lines
         if self.focus.vel.x > 0 and self.focus_screen_rect.right >= self.screen_middle.x + outer_line_x:
-            self.focus_offset.x = -inner_line_x - self.focus_screen_rect.width
+            self.focus_offset.x = -inner_line_x - self.focus_screen_rect.width * 0.5
         elif self.focus.vel.x > 0 and self.focus_screen_rect.right >= self.screen_middle.x - inner_line_x and self.focus_screen_rect.right <= self.screen_middle.x:
-            self.focus_offset.x = -inner_line_x - self.focus_screen_rect.width
+            self.focus_offset.x = -inner_line_x - self.focus_screen_rect.width * 0.5
 
         if self.focus.vel.x < 0 and self.focus_screen_rect.left <= self.screen_middle.x - outer_line_x:
-            self.focus_offset.x = inner_line_x + self.focus_screen_rect.width * 0.5
+            self.focus_offset.x = inner_line_x + self.focus_screen_rect.width
         elif self.focus.vel.x < 0 and self.focus_screen_rect.left <= self.screen_middle.x + inner_line_x and self.focus_screen_rect.left >= self.screen_middle.x:
-            self.focus_offset.x = inner_line_x + self.focus_screen_rect.width * 0.5
+            self.focus_offset.x = inner_line_x + self.focus_screen_rect.width
 
         self.focus_offset.y = 0
 

@@ -8,6 +8,8 @@ from colors import *
 class HitBox(RigidBody):
     def __init__(self, parent, x, y, width, height, birth, lifetime, power, knockback, stick=True, color=None):
         super().__init__(parent.scene)
+        self.scene.rigid_bodies.remove(self)
+        self.scene.hitboxes.add(self)
 
         self.parent = parent
 
@@ -16,9 +18,11 @@ class HitBox(RigidBody):
         self.power = power # how much damage it does
         self.knockback = knockback # how far it knocks back enemies
         
-        self.image = pg.Surface([width, height])
+        self.image = pg.Surface([width, height], pg.SRCALPHA, 32)
         if color != None:
             self.image.fill(color)
+        else:
+            self.image = self.image.convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
 
@@ -40,7 +44,6 @@ class HitBox(RigidBody):
         for sprite in collisions:
             if isinstance(sprite, HitBox) or (sprite is self.parent):
                 continue
-
             
             # deal damage and apply knockback
             if hasattr(sprite, "health"):
@@ -48,14 +51,17 @@ class HitBox(RigidBody):
                     if type(sprite) != type(self.parent):
                         sprite.health -= self.power
 
-                    diff = pg.math.Vector2(sprite.rect.center) - pg.math.Vector2(self.parent.rect.center)
+                    diff = pg.math.Vector2(sprite.rect.midtop) - pg.math.Vector2(self.parent.rect.midbottom)
                     if diff.length() == 0:
                         diff.x += 1
                     diff = diff.normalize()
                     knockback_vector = diff * (self.knockback) + self.parent.vel + pg.math.Vector2(0, -400)
 
                     sprite.vel = knockback_vector
-                    sprite.invinsible_time = 0.5
+                    sprite.rect.y -= 1
+                    sprite.pos.y -= 1
+                    
+                    sprite.invinsible_time = 0.1
 
         # determine if we should die
         if t - self.birth >= self.lifetime:

@@ -45,9 +45,14 @@ class Character(RigidBody):
         self.invinsible_time = 0
 
     def update(self, dt, t):
+        super().update(dt, t)
+
         self.invinsible_time -= dt
         if self.invinsible_time < 0:
             self.invinsible_time = 0
+        self.knockback_time -= dt
+        if self.knockback_time < 0 and self.landed:
+            self.knockback_time = 0
 
     def apply_friction(self):
         if self.landed and self.move_dir == 0:

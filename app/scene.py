@@ -39,6 +39,7 @@ class Scene:
         self.children = pg.sprite.Group() # all child sprites
 
         self.rigid_bodies = pg.sprite.Group() # affected by gravity
+        self.hitboxes = pg.sprite.Group()
         self.static_bodies = pg.sprite.Group() # immobile platforms
         self.projectiles = pg.sprite.Group() # unaffected by gravity
         self.particles = pg.sprite.Group() # unaffected by anything
@@ -60,8 +61,13 @@ class Scene:
         # camera
         self.camera = Camera(self, 1000, 0.05, 300)
 
+        self.platform_columns = []
+
 
     def express_map(self, tile_map, tile_size=64):
+        for x in range(len(tile_map)):
+            self.platform_columns.append(pg.sprite.Group())
+
         for x, line in enumerate(tile_map):
             platform_y_start = None
             last_was_platform = False
@@ -81,7 +87,14 @@ class Scene:
                     y_pxl = platform_y_start * tile_size
                     height = (y - platform_y_start) * tile_size
                     width = tile_size
-                    Platform(self, x_pxl, y_pxl, width, height)
+                    p = Platform(self, x_pxl, y_pxl, width, height)
+                    self.platform_columns[x].add(p)
+
+                    if x > 0:
+                        self.platform_columns[x - 1].add(p)
+                    if x < len(self.platform_columns) - 1:
+                        self.platform_columns[x + 1].add(p)
+
                     last_was_platform = False
 
     def get_relative_mouse_pos(self):
@@ -104,6 +117,7 @@ class Scene:
             self.draw_group(self.static_bodies)
             self.draw_group(self.projectiles)
             self.draw_group(self.rigid_bodies)
+            self.draw_group(self.hitboxes)
             self.draw_group(self.particles)
             self.draw_group(self.hud)
             self.draw_group(self.edges)
@@ -138,6 +152,8 @@ class Scene:
         else:
             self.drawing = True
 
+        for hitbox in self.hitboxes:
+            hitbox.update(synth_dt, t)
         for sprite in self.rigid_bodies:
             sprite.update(synth_dt, t)
         for particle in self.particles:

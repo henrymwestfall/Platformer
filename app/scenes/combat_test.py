@@ -23,7 +23,7 @@ class CombatTest(Scene):
         raw_map = load_tile_map("CombatTest")
         self.express_map(raw_map)
 
-    def start(self):
+    def start(self, _):
         pg.display.set_caption("Combat Test")
 
         self.player = Player(self, self.screen.get_width() // 2, 300)
@@ -45,6 +45,8 @@ class CombatTest(Scene):
 
     def update(self, dt, t):
         super().update(dt, t)
+
+        pg.display.set_caption(str(round(1 / dt, 2)))
 
         for body in self.rigid_bodies:
             if isinstance(body, Mob):
